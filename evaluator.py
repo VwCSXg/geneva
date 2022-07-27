@@ -181,7 +181,7 @@ class Evaluator():
                     self.logger.exception("Failed to create evaluator environment - is docker running?")
                     return
 
-            self.worker(ind_list, "main", environment)
+            self.worker(ind_list, environment)
 
         for ind in ind_list:
             self.read_fitness(ind)
@@ -298,7 +298,7 @@ class Evaluator():
         elif environment.get("docker"):
             self.run_docker_client(args, environment, logger)
         else:
-            self.run_local_client(args, environment, logger)
+            self.run_local_client(args, logger)
 
         fitpath = os.path.join(BASEPATH, self.output_directory, actions.utils.FLAGFOLDER, environment["id"]) + ".fitness"
         # Do not overwrite the fitness if it already exists
@@ -462,13 +462,12 @@ class Evaluator():
             for line in client_log:
                 fd.write(line)
 
-    def run_local_client(self, args, environment, logger):
+    def run_local_client(self, args, logger):
         """
         Runs client locally. Does not return fitness.
 
         Args:
             args (dict): Dictionary of arguments
-            environment (dict): Dictionary describing environment configuration for this evaluation
             logger (:obj:`logging.Logger`): A logger to log with
         """
         # Launch the plugin client
@@ -647,7 +646,7 @@ class Evaluator():
                 self.logger.error("Failed to create evaluator environment - is docker running?")
                 return None
 
-        self.worker([canary], canary.environment_id, environment)
+        self.worker([canary], environment)
 
         self.logger.info("Collected packets under %s" % canary)
         return "canary"
@@ -675,7 +674,7 @@ class Evaluator():
         """
         self.logger.debug("Initializing docker environment.")
 
-        # We can't have an environment with an intenral test server and no censor
+        # We can't have an environment with an internal test server and no censor
         # with the current set up. To be addressed later to allow for no censor testing
         assert not (not self.censor and not self.external_server), "Can't create internal server w/o censor"
         assert not (self.censor and self.external_server), "Can't create a censor without an internal training server"
@@ -737,7 +736,7 @@ class Evaluator():
             str: IP address
         """
         _exit_code, output = container.exec_run(["ifconfig", iface], privileged=True)
-        ip = re.findall(r'[0-9]+(?:\.[0-9]+){3}', output.decode("utf-8"))[0]
+        ip = re.findall(r'\d+(?:\.\d+){3}', output.decode("utf-8"))[0]
         return ip
 
     def setup_remote(self):
@@ -784,14 +783,13 @@ class Evaluator():
                 i += 1
         return remote
 
-    def worker(self, ind_list, worker_id, environment):
+    def worker(self, ind_list, environment):
         """
         Perform the actual fitness evaluation as a multithreaded worker. The
         worker pops off an individual from the list and evaluates it.
 
         Args:
             ind_list (list): List of strategy objects to evaluate
-            worker_id (int): ID of this worker
             environment (dict): Environment dictionary
         """
         environment["remote"] = None
@@ -840,7 +838,6 @@ class Evaluator():
         """
         log_files = ["client.log", "engine.log", "censor.log", "server.log"]
         for log_file in log_files:
-            log = ""
             log_path = os.path.join(BASEPATH,
                                     self.output_directory,
                                     "logs",
@@ -891,11 +888,11 @@ class Evaluator():
             dict: Dictionary containing docker container object and relevant information
         """
         try:
-            container = {}
-            container["name"] = name
-            # Note that this is _not_ safe to do in a multiprocessed context - must be run single threaded.
-            container["container"] = self.docker_client.containers.run('base', detach=True, privileged=True, volumes={os.path.abspath(os.getcwd()): {"bind" : "/code", "mode" : "rw"}}, tty=True, remove=True, name=name)
-            container["settings"] = self.apiclient.inspect_container(name)
+            container = {"name": name,
+                         # Note that this is _not_ safe to do in a multiprocessed context - must be run single threaded.
+                         "container": self.docker_client.containers.run('base', detach=True, privileged=True, volumes={os.path.abspath(os.getcwd()): {"bind": "/code", "mode": "rw"}}, tty=True, remove=True, name=name),
+                         "settings": self.apiclient.inspect_container(name)}
+
         except docker.errors.NotFound:
             self.logger.error("Could not run container \"base\". Is docker not running, or does the base container not exist?")
             return None
@@ -1079,7 +1076,7 @@ def collect_plugin(test_plugin, plugin_type, command, full_args, plugin_args):
         parsed_args = {k:v for k,v in parsed_args.items() if v or (not v and k not in full_args) }
         full_args.update(parsed_args)
         plugin_args.update(parsed_args)
-    except ImportError as exc:
+    except ImportError:
         pass
     return cls
 
