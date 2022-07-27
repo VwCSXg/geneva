@@ -213,23 +213,6 @@ def fitness_function(logger, population, ga_evaluator):
     return population
 
 
-def sel_random(individuals, k):
-    """
-    Implementation credit to DEAP: https://github.com/DEAP/deap
-    Select *k* individuals at random from the input *individuals* with
-    replacement. The list returned contains references to the input
-    *individuals*.
-
-    Args:
-        individuals (list): A list of individuals to select from.
-        k (int): The number of individuals to select.
-
-    Returns:
-        list: A list of selected individuals.
-    """
-    return [random.choice(individuals) for _ in range(k)]
-
-
 def selection_tournament(individuals, k, tournsize, fit_attr="fitness"):
     """
     Implementation credit to DEAP: https://github.com/DEAP/deap
@@ -248,22 +231,9 @@ def selection_tournament(individuals, k, tournsize, fit_attr="fitness"):
     """
     chosen = []
     for _ in range(k):
-        aspirants = sel_random(individuals, tournsize)
+        aspirants = random.choices(individuals, k=tournsize)
         chosen.append(copy.deepcopy(max(aspirants, key=operator.attrgetter(fit_attr))))
     return chosen
-
-
-def get_unique_population_size(population):
-    """
-    Computes number of unique individuals in a population.
-
-    Args:
-        population (list): Population list
-    """
-    uniques = {}
-    for ind in population:
-        uniques[str(ind)] = True
-    return len(list(uniques.keys()))
 
 
 def add_to_hof(hof, population):
@@ -348,7 +318,7 @@ def mutation_crossover(logger, population, hall, options):
             mutation_accepted = False
             while not mutation_accepted:
                 test_subject = copy.deepcopy(offspring[i])
-                mutate_individual(logger, test_subject)
+                test_subject.mutate(logger)
 
                 # Pull out some metadata about this proposed mutation
                 fitness_history = hall.get(str(test_subject), [])
@@ -367,20 +337,6 @@ def mutation_crossover(logger, population, hall, options):
             offspring[i].fitness = -1000
 
     return offspring
-
-
-def mutate_individual(logger, ind):
-    """
-    Simply calls the mutate function of the given individual.
-
-    Args:
-        logger (:obj:`logging.Logger`): A logger to log with
-        ind (:obj:`actions.strategy.Strategy`): A strategy individual to mutate
-
-    Returns:
-        :obj:`actions.strategy.Strategy`: Mutated individual
-    """
-    return ind.mutate(logger)
 
 
 def run_collection_phase(logger, ga_evaluator):
@@ -566,13 +522,14 @@ def genetic_solve(logger, options, ga_evaluator):
             hall = add_to_hof(hall, offspring)
 
             # Save current hall of fame
-            filename = os.path.join(ga_generations_dir, "hall" + str(gen) + ".txt")
-            write_hall(filename, hall)
+            with open(os.path.join(ga_generations_dir, f"hall{gen}.txt"), "w") as fd:
+                fd.write(collect_results(hall))
 
             # Status printing for this generation
-            logger.info("\nGeneration: %d | Unique Inviduals: %d | Avg Fitness: %d | Best Fitness [%s] %s: %s",
-                        gen, get_unique_population_size(population), round(total_fitness / float(len(offspring)), 2),
-                        best_ind.environment_id, str(best_fit), str(best_ind))
+            logger.info(f"\nGeneration: {gen} | "
+                        f"Unique Inviduals: {len(set([str(item) for item in population]))} | "
+                        f"Avg Fitness: {round(total_fitness / float(len(offspring)), 2)} | "
+                        f"Best Fitness [{best_ind.environment_id}] {best_fit}: {best_ind}")
 
             # Select next generation
             population = selection_tournament(offspring, k=len(offspring) - options["elite_clones"], tournsize=10)
@@ -617,29 +574,6 @@ def collect_results(hall_of_fame):
         sind = str(ind)
         output += "Avg. Fitness %s: %s (Evaluated %d times: %s)\n" % (sum(hall_of_fame[sind])/len(hall_of_fame[sind]), sind, len(hall_of_fame[sind]), hall_of_fame[sind])
     return output
-
-
-def print_results(hall_of_fame, logger):
-    """
-    Prints hall of fame.
-
-    Args:
-        hall_of_fame (dict): Hall of fame to print
-        logger (:obj:`logging.Logger`): A logger to log results with
-    """
-    logger.info("\n%s", collect_results(hall_of_fame))
-
-
-def write_hall(filename, hall_of_fame):
-    """
-    Writes hall of fame out to a file.
-
-    Args:
-        filename (str): Filename to write results to
-        hall_of_fame (dict): Hall of fame of individuals
-    """
-    with open(filename, "w") as fd:
-        fd.write(collect_results(hall_of_fame))
 
 
 def eval_only(logger, requested, ga_evaluator, runs=1):
@@ -819,7 +753,7 @@ def driver(cmd):
 
         if hall_of_fame and not args.no_print_hall:
             # Print the final results
-            print_results(hall_of_fame, logger)
+            logger.info(f"\n%s", collect_results(hall_of_fame))
 
         # Teardown the evaluator if needed
         if ga_evaluator:
