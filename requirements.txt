@@ -11,11 +11,9 @@ cryptography==3.3.2
 paramiko
 codecov
 pytest-cov
-dnspython
 tld
 python-dotenv
 mysql-connector
 beautifulsoup4
-requests
 psutil
 tqdm
