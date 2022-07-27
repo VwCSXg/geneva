@@ -4,6 +4,26 @@ import actions.utils
 import actions.tree
 
 
+def str_forest(forest):
+    """
+    Returns a string representation of a given forest (inbound or outbound)
+    """
+    rep = ""
+    for action_tree in forest:
+        rep += f"{action_tree} "
+    return rep
+
+
+def pretty_str_forest(forest):
+    """
+    Returns a string representation of a given forest (inbound or outbound)
+    """
+    rep = ""
+    for action_tree in forest:
+        rep += f"{action_tree.pretty_print()}\n"
+    return rep
+
+
 class Strategy(object):
     def __init__(self, in_actions, out_actions, environment_id=None):
         self.in_actions = in_actions
@@ -20,7 +40,7 @@ class Strategy(object):
         """
         Builds a string describing the action trees for this strategy.
         """
-        return "%s \/ %s" % (self.str_forest(self.out_actions).strip(), self.str_forest(self.in_actions).strip())
+        return f"{str_forest(self.out_actions).strip()} \\/ {str_forest(self.in_actions).strip()}"
 
     def __len__(self):
         """
@@ -33,26 +53,8 @@ class Strategy(object):
             num += len(tree)
         return num
 
-    def str_forest(self, forest):
-        """
-        Returns a string representation of a given forest (inbound or outbound)
-        """
-        rep = ""
-        for action_tree in forest:
-            rep += "%s " % str(action_tree)
-        return rep
-
     def pretty_print(self):
-        return "%s \n \/ \n %s" % (self.pretty_str_forest(self.out_actions), self.pretty_str_forest(self.in_actions))
-
-    def pretty_str_forest(self, forest):
-        """
-        Returns a string representation of a given forest (inbound or outbound)
-        """
-        rep = ""
-        for action_tree in forest:
-            rep += "%s\n" % action_tree.pretty_print()
-        return rep
+        return f"{pretty_str_forest(self.out_actions)} \n \\/ \n {pretty_str_forest(self.in_actions)}"
 
     def initialize(self, logger, num_in_trees, num_out_trees, num_in_actions, num_out_actions, seed, disabled=None):
         """
@@ -79,7 +81,7 @@ class Strategy(object):
         """
         Initializes this individual by drawing random actions.
         """
-        for _ in range(0, num_in_trees):
+        for _ in range(num_in_trees):
             # Define a new in action tree
             in_tree = actions.tree.ActionTree("in")
             # Initialize the in tree
@@ -87,14 +89,13 @@ class Strategy(object):
             # Add them to this strategy
             self.in_actions.append(in_tree)
 
-        for _ in range(0, num_out_trees):
+        for _ in range(num_out_trees):
             # Define a new out action tree
             out_tree = actions.tree.ActionTree("out")
             # Initialize the out tree
             out_tree.initialize(num_out_actions, self.environment_id, disabled=disabled)
             # Add them to this strategy
             self.out_actions.append(out_tree)
-
 
     def act_on_packet(self, packet, logger, direction="out"):
         """
@@ -105,7 +106,6 @@ class Strategy(object):
            (direction == "in" and not self.in_actions):
             return [packet]
         return self.run_on_packet(packet, logger, direction)
-
 
     def run_on_packet(self, packet, logger, direction):
         """
