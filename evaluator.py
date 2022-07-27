@@ -491,7 +491,7 @@ class Evaluator():
         self.logger.debug(" ".join(command))
         try:
             if actions.utils.get_console_log_level() == "debug":
-                subprocess.check_call(command, timeout=60)
+                subprocess.check_call(command, timeout=timeout)
             else:
                 subprocess.check_call(command, stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL, timeout=60)
         except subprocess.CalledProcessError as exc:
@@ -515,7 +515,7 @@ class Evaluator():
         self.logger.debug(" ".join(command))
         output = ""
         try:
-            output = subprocess.check_output(command, timeout=60, stderr=subprocess.PIPE).decode('utf-8', 'ignore')
+            output = subprocess.check_output(command, timeout=timeout, stderr=subprocess.PIPE).decode('utf-8', 'ignore')
             if actions.utils.get_console_log_level() == "debug":
                 self.logger.debug(output)
         except subprocess.CalledProcessError as exc:
