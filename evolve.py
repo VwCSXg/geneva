@@ -267,6 +267,7 @@ def generate_strategy(logger, num_in_trees, num_out_trees, num_in_actions, num_o
         num_out_trees (int): Number of trees to initialize in the outbound forest
         num_in_actions (int): Number of actions to initialize in the each inbound tree
         num_out_actions (int): Number of actions to initialize in the each outbound tree
+        seed (str): Seed strategy
         environment_id (str, optional): Environment ID to assign to the new individual
         disabled (str, optional): List of actions that should not be considered in building a new strategy
 
@@ -527,7 +528,7 @@ def genetic_solve(logger, options, ga_evaluator):
 
             # Status printing for this generation
             logger.info(f"\nGeneration: {gen} | "
-                        f"Unique Inviduals: {len(set([str(item) for item in population]))} | "
+                        f"Unique Inviduals: {len({map(str, population)})} | "
                         f"Avg Fitness: {round(total_fitness / float(len(offspring)), 2)} | "
                         f"Best Fitness [{best_ind.environment_id}] {best_fit}: {best_ind}")
 
