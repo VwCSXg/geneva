@@ -29,8 +29,6 @@ import geneva.layers.packet
 import geneva.actions.strategy
 import geneva.actions.utils
 
-BASEPATH = os.path.dirname(os.path.abspath(__file__))
-
 
 class Engine():
     def __init__(self, server_port,
@@ -74,27 +72,18 @@ class Engine():
             self.forward_ip = forwarder["forward_ip"]
 
         # Set up the directory and ID for logging
-        if not output_directory:
-            self.output_directory = "trials"
-        else:
-            self.output_directory = output_directory
+        self.output_directory = os.path.abspath(output_directory)
         geneva.actions.utils.setup_dirs(self.output_directory)
         if not environment_id:
             self.environment_id = geneva.actions.utils.get_id()
 
         # Set up a logger
-        self.logger = geneva.actions.utils.get_logger(BASEPATH,
-                                                      self.output_directory,
+        self.logger = geneva.actions.utils.get_logger(self.output_directory,
                                                       __name__,
-                                               "engine",
+                                                      "engine",
                                                       self.environment_id,
                                                       log_level=log_level,
                                                       demo_mode=demo_mode)
-        # Warn if these are not provided
-        if not environment_id:
-            self.logger.warning("No environment ID given, one has been generated (%s)", self.environment_id)
-        if not output_directory:
-            self.logger.warning("No output directory specified, using the default (%s)" % self.output_directory)
 
         # Used for conditional context manager usage
         self.enabled = enabled
@@ -316,8 +305,7 @@ class Engine():
         self.out_nfqueue_socket.close()
         self.in_nfqueue_socket.close()
 
-        packets_path = os.path.join(BASEPATH,
-                                    self.output_directory,
+        packets_path = os.path.join(self.output_directory,
                                     "packets",
                                     "original_%s.pcap" % self.environment_id)
 
