@@ -414,37 +414,31 @@ class Engine():
         nfpacket.accept()
 
 
-def get_args():
-    """
-    Sets up argparse and collects arguments.
-    """
-    parser = argparse.ArgumentParser(description='The engine that runs a given strategy.')
-    # Store a string, not int, in case of port ranges/lists. The iptables command checks the port var
-    parser.add_argument('--server-port', action='store', required=True)
-    parser.add_argument('--environment-id', action='store', help="ID of the current strategy under test")
-    parser.add_argument('--sender-ip', action='store', help="IP address of sending machine, used for NAT")
-    parser.add_argument('--routing-ip', action='store', help="Public IP of this machine, used for NAT")
-    parser.add_argument('--forward-ip', action='store', help="IP address to forward traffic to")
-    parser.add_argument('--strategy', action='store', help="Strategy to deploy")
-    parser.add_argument('--output-directory', default="trials", action='store', help="Where to output logs, captures, and results. Defaults to trials/.")
-    parser.add_argument('--forward', action='store_true', help='Enable if this is forwarding traffic')
-    parser.add_argument('--server-side', action='store_true', help='Enable if this is running on the server side')
-    parser.add_argument('--log', action='store', default="debug",
-                        choices=("debug", "info", "warning", "critical", "error"),
-                        help="Sets the log level")
-    parser.add_argument('--no-save-packets', action='store_false', help='Disables recording captured packets')
-    parser.add_argument("--in-queue-num", action="store", help="NfQueue number for incoming packets", default=1, type=int)
-    parser.add_argument("--out-queue-num", action="store", help="NfQueue number for outgoing packets", default=None, type=int)
-    parser.add_argument("--demo-mode", action='store_true', help="Replaces all IPs with dummy IPs in log messages so as not to reveal sensitive IP addresses")
-
-    args = parser.parse_args()
-    return args
+parser = argparse.ArgumentParser(description='The engine that runs a given strategy.')
+# Store a string, not int, in case of port ranges/lists. The iptables command checks the port var
+parser.add_argument('--server-port', action='store', required=True)
+parser.add_argument('--environment-id', action='store', help="ID of the current strategy under test")
+parser.add_argument('--sender-ip', action='store', help="IP address of sending machine, used for NAT")
+parser.add_argument('--routing-ip', action='store', help="Public IP of this machine, used for NAT")
+parser.add_argument('--forward-ip', action='store', help="IP address to forward traffic to")
+parser.add_argument('--strategy', action='store', help="Strategy to deploy")
+parser.add_argument('--output-directory', default="trials", action='store', help="Where to output logs, captures, and results. Defaults to trials/.")
+parser.add_argument('--forward', action='store_true', help='Enable if this is forwarding traffic')
+parser.add_argument('--server-side', action='store_true', help='Enable if this is running on the server side')
+parser.add_argument('--log', action='store', default="debug",
+                    choices=("debug", "info", "warning", "critical", "error"),
+                    help="Sets the log level")
+parser.add_argument('--no-save-packets', action='store_false', help='Disables recording captured packets')
+parser.add_argument("--in-queue-num", action="store", help="NfQueue number for incoming packets", default=1, type=int)
+parser.add_argument("--out-queue-num", action="store", help="NfQueue number for outgoing packets", default=None, type=int)
+parser.add_argument("--demo-mode", action='store_true', help="Replaces all IPs with dummy IPs in log messages so as not to reveal sensitive IP addresses")
 
 
 def main(args):
     """
     Kicks off the engine with the given arguments.
     """
+    args = vars(args)
     nat_config = {}
     if args.get("sender_ip") and args.get("routing_ip") and args.get("forward_ip"):
         nat_config = {"sender_ip": args["sender_ip"],
@@ -467,4 +461,4 @@ def main(args):
 
 
 if __name__ == "__main__":
-    main(vars(get_args()))
+    main(parser.parse_args())

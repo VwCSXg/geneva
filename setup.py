@@ -8,6 +8,9 @@ setup(
     license='BSD 3-Clause License',
     packages=['geneva'],
     zip_safe=False,
+    entry_points={
+        'console_scripts': ['geneva=geneva.cli:main'],
+    },
     include_package_data=True,
     install_requires=[
         'requests',
