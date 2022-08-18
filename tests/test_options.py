@@ -5,7 +5,7 @@ import pytest
 sys.path.append("..")
 
 import actions.strategy
-import actions.utils
+import geneva.actions.utils
 import actions.tamper
 import layers.layer
 import layers.tcp_layer

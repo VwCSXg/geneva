@@ -1,0 +1,33 @@
+from setuptools import setup
+
+setup(
+    name='geneva',
+    description='Genetic Evasion',
+    url='https://github.com/kkevsterrr/geneva',
+    author='Kevin Bock and George Hughey and Xiao Qiang and Dave Levin',
+    license='BSD 3-Clause License',
+    packages=['geneva'],
+    zip_safe=False,
+    include_package_data=True,
+    install_requires=[
+        'requests',
+        'scapy',
+        'dnspython',
+        'docker',
+        'anytree',
+        'graphviz',
+        'netifaces',
+        'netfilterqueue',
+        'cryptography',
+        'paramiko',
+        'codecov',
+        'pytest-cov',
+        'dnspython',
+        'tld',
+        'python-dotenv',
+        'mysql-connector',
+        'beautifulsoup4',
+        'psutil',
+        'tqdm',
+    ],
+)

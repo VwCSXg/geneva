@@ -5,7 +5,7 @@ sys.path.append("..")
 
 import actions.action
 import actions.strategy
-import actions.utils
+import geneva.actions.utils
 import actions.duplicate
 
 
@@ -42,9 +42,9 @@ def test_punish_no_engine(logger):
     """
     Tests that punish_fitness properly handles no engine
     """
-    assert 100 == actions.utils.punish_fitness(100, logger, None)
-    assert 100 == actions.utils.punish_complexity(100, logger, None)
-    assert 100 == actions.utils.punish_unused(100, logger, None)
+    assert 100 == geneva.actions.utils.punish_fitness(100, logger, None)
+    assert 100 == geneva.actions.utils.punish_complexity(100, logger, None)
+    assert 100 == geneva.actions.utils.punish_unused(100, logger, None)
 
 
 def test_write_fitness_error(logger):
@@ -52,19 +52,19 @@ def test_write_fitness_error(logger):
     Tests handling of write fitness error cases
     """
     with pytest.raises(ValueError):
-        actions.utils.write_fitness("<thiswillfail>", None, None)
+        geneva.actions.utils.write_fitness("<thiswillfail>", None, None)
 
 
 def test_skipstrat(logger):
     """
     Tests we can create and raise a SkipStrategyException
     """
-    with pytest.raises(actions.utils.SkipStrategyException):
-        raise actions.utils.SkipStrategyException("Skip this!", 100)
+    with pytest.raises(geneva.actions.utils.SkipStrategyException):
+        raise geneva.actions.utils.SkipStrategyException("Skip this!", 100)
 
 
 def test_import_plugin(logger):
     """
     Tries to import some plugins
     """
-    assert actions.utils.import_plugin("http", "client")
+    assert geneva.actions.utils.import_plugin("http", "client")

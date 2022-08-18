@@ -5,9 +5,9 @@ import sys
 sys.path.append("..")
 
 import actions.fragment
-import layers.packet
+import geneva.layers.packet
 import actions.strategy
-import actions.utils
+import geneva.actions.utils
 import evolve
 
 from scapy.all import IP, TCP, UDP
@@ -22,7 +22,7 @@ def test_segment(logger):
     fragment = actions.fragment.FragmentAction(correct_order=True)
     assert str(fragment) == "fragment{tcp:-1:True}", "Fragment returned incorrect string representation: %s" % str(fragment)
 
-    packet = layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1")/TCP()/("data"))
+    packet = geneva.layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1") / TCP() / ("data"))
     packet1, packet2 = fragment.run(packet, logger)
 
     assert id(packet1) != id(packet2), "Duplicate aliased packet objects"
@@ -38,7 +38,7 @@ def test_segment_wrap(logger):
     fragment = actions.fragment.FragmentAction(correct_order=True)
     assert str(fragment) == "fragment{tcp:-1:True}", "Fragment returned incorrect string representation: %s" % str(fragment)
 
-    packet = layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1")/TCP()/("data"))
+    packet = geneva.layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1") / TCP() / ("data"))
     packet["TCP"].seq = MAX_UINT-1
     packet1, packet2 = fragment.run(packet, logger)
 
@@ -57,7 +57,7 @@ def test_segment_wrap2(logger):
     fragment = actions.fragment.FragmentAction(correct_order=True)
     assert str(fragment) == "fragment{tcp:-1:True}", "Fragment returned incorrect string representation: %s" % str(fragment)
 
-    packet = layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1")/TCP()/("data"))
+    packet = geneva.layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1") / TCP() / ("data"))
     packet["TCP"].seq = MAX_UINT
     packet1, packet2 = fragment.run(packet, logger)
 
@@ -77,7 +77,7 @@ def test_segment_wrap3(logger):
     fragment = actions.fragment.FragmentAction(correct_order=True)
     assert str(fragment) == "fragment{tcp:-1:True}", "Fragment returned incorrect string representation: %s" % str(fragment)
 
-    packet = layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1")/TCP()/("data"))
+    packet = geneva.layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1") / TCP() / ("data"))
     packet["TCP"].seq = MAX_UINT-2
     packet1, packet2 = fragment.run(packet, logger)
 
@@ -97,7 +97,7 @@ def test_segment_reverse(logger):
     fragment = actions.fragment.FragmentAction(correct_order=False)
     assert str(fragment) == "fragment{tcp:-1:False}", "Fragment returned incorrect string representation: %s" % str(fragment)
 
-    packet = layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1")/TCP()/("data"))
+    packet = geneva.layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1") / TCP() / ("data"))
     packet1, packet2 = fragment.run(packet, logger)
 
     assert id(packet1) != id(packet2), "Duplicate aliased packet objects"
@@ -114,7 +114,7 @@ def test_odd_fragment(logger):
     fragment = actions.fragment.FragmentAction(correct_order=True, segment=False)
     assert str(fragment) == "fragment{ip:-1:True}", "Fragment returned incorrect string representation: %s" % str(fragment)
 
-    packet = layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1", proto=0x06)/TCP(sport=2222, dport=3333, seq=100, ack=100, flags="S")/("dataisodd"))
+    packet = geneva.layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1", proto=0x06) / TCP(sport=2222, dport=3333, seq=100, ack=100, flags="S") / ("dataisodd"))
     packet1, packet2 = fragment.run(packet, logger)
 
     assert id(packet1) != id(packet2), "Duplicate aliased packet objects"
@@ -132,7 +132,7 @@ def test_custom_fragment(logger):
     fragment = actions.fragment.FragmentAction(correct_order=True, fragsize=3, segment=False)
     assert str(fragment) == "fragment{ip:3:True}", "Fragment returned incorrect string representation: %s" % str(fragment)
 
-    packet = layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1", proto=0x06)/TCP(sport=2222, dport=3333, seq=100, ack=100, flags="S")/("thisissomedata"))
+    packet = geneva.layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1", proto=0x06) / TCP(sport=2222, dport=3333, seq=100, ack=100, flags="S") / ("thisissomedata"))
     packet1, packet2 = fragment.run(packet, logger)
 
     assert id(packet1) != id(packet2), "Duplicate aliased packet objects"
@@ -149,7 +149,7 @@ def test_reverse_fragment(logger):
     fragment = actions.fragment.FragmentAction(correct_order=False, fragsize=3, segment=False)
     assert str(fragment) == "fragment{ip:3:False}", "Fragment returned incorrect string representation: %s" % str(fragment)
 
-    packet = layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1", proto=0x06)/TCP(sport=2222, dport=3333, seq=100, ack=100, flags="S")/("thisissomedata"))
+    packet = geneva.layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1", proto=0x06) / TCP(sport=2222, dport=3333, seq=100, ack=100, flags="S") / ("thisissomedata"))
     packet1, packet2 = fragment.run(packet, logger)
 
     assert id(packet1) != id(packet2), "Duplicate aliased packet objects"
@@ -166,7 +166,7 @@ def test_udp_fragment(logger):
     fragment = actions.fragment.FragmentAction(correct_order=False, fragsize=2, segment=False)
     assert str(fragment) == "fragment{ip:2:False}", "Fragment returned incorrect string representation: %s" % str(fragment)
 
-    packet = layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1", proto=0x06)/UDP(sport=2222, dport=3333, chksum=0x4444)/("thisissomedata"))
+    packet = geneva.layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1", proto=0x06) / UDP(sport=2222, dport=3333, chksum=0x4444) / ("thisissomedata"))
     packet1, packet2 = fragment.run(packet, logger)
 
     assert id(packet1) != id(packet2), "Duplicate aliased packet objects"
@@ -183,7 +183,7 @@ def test_mutate(logger):
     for _ in range(0, 200):
         fragment.mutate()
         fragment.parse(str(fragment), logger)
-        packet = layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1", proto=0x06)/TCP(sport=2222, dport=3333, chksum=0x4444)/("thisissomedata"))
+        packet = geneva.layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1", proto=0x06) / TCP(sport=2222, dport=3333, chksum=0x4444) / ("thisissomedata"))
         packet1, packet2 = fragment.run(packet, logger)
 
 
@@ -211,29 +211,29 @@ def test_parse(logger):
 
     fragment = actions.fragment.FragmentAction()
     assert fragment.correct_order in [True, False]
-    packet = layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1")/TCP(sport=2222, dport=3333, seq=100, ack=100, flags="S"))
+    packet = geneva.layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1") / TCP(sport=2222, dport=3333, seq=100, ack=100, flags="S"))
 
-    strat = actions.utils.parse("[IP:proto:6:0]-tamper{IP:proto:replace:6}(fragment{ip:-1:True}(tamper{TCP:dataofs:replace:8}(duplicate,),tamper{IP:frag:replace:0}),)-| [IP:tos:0:0]-duplicate-| \/", logger)
+    strat = geneva.actions.utils.parse("[IP:proto:6:0]-tamper{IP:proto:replace:6}(fragment{ip:-1:True}(tamper{TCP:dataofs:replace:8}(duplicate,),tamper{IP:frag:replace:0}),)-| [IP:tos:0:0]-duplicate-| \/", logger)
     strat.act_on_packet(packet, logger)
 
-    packet = layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1")/UDP(sport=2222, dport=3333, chksum=0x4444))
-    strat = actions.utils.parse("[IP:proto:6:0]-tamper{IP:proto:replace:6}(fragment{ip:-1:True}(tamper{TCP:dataofs:replace:8}(duplicate,),tamper{IP:frag:replace:0}),)-| [IP:tos:0:0]-duplicate-| \/", logger)
+    packet = geneva.layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1") / UDP(sport=2222, dport=3333, chksum=0x4444))
+    strat = geneva.actions.utils.parse("[IP:proto:6:0]-tamper{IP:proto:replace:6}(fragment{ip:-1:True}(tamper{TCP:dataofs:replace:8}(duplicate,),tamper{IP:frag:replace:0}),)-| [IP:tos:0:0]-duplicate-| \/", logger)
     strat.act_on_packet(packet, logger)
 
-    packet = layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1")/TCP(sport=2222, dport=3333, chksum=0x4444))
-    strat = actions.utils.parse("[TCP:urgptr:0]-tamper{TCP:options-altchksumopt:corrupt}(fragment{tcp:-1:True}(tamper{IP:proto:corrupt},tamper{TCP:seq:replace:654077552}),)-| \/", logger)
+    packet = geneva.layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1") / TCP(sport=2222, dport=3333, chksum=0x4444))
+    strat = geneva.actions.utils.parse("[TCP:urgptr:0]-tamper{TCP:options-altchksumopt:corrupt}(fragment{tcp:-1:True}(tamper{IP:proto:corrupt},tamper{TCP:seq:replace:654077552}),)-| \/", logger)
     strat.act_on_packet(packet, logger)
 
-    strat = actions.utils.parse("[TCP:options-mss:]-tamper{TCP:load:replace:}(fragment{tcp:-1:True},)-| \/", logger)
+    strat = geneva.actions.utils.parse("[TCP:options-mss:]-tamper{TCP:load:replace:}(fragment{tcp:-1:True},)-| \/", logger)
     strat.act_on_packet(packet, logger)
 
-    strat = actions.utils.parse("[TCP:options-mss:]-tamper{IP:frag:replace:1353}(tamper{TCP:load:replace:}(fragment{tcp:-1:True},),)-| \/", logger)
+    strat = geneva.actions.utils.parse("[TCP:options-mss:]-tamper{IP:frag:replace:1353}(tamper{TCP:load:replace:}(fragment{tcp:-1:True},),)-| \/", logger)
     strat.act_on_packet(packet, logger)
 
-    strat = actions.utils.parse("[IP:ihl:5]-duplicate-| [TCP:options-mss:]-tamper{IP:frag:replace:1353}(fragment{tcp:-1:True}(tamper{TCP:load:replace:}(fragment{tcp:-1:False},),tamper{DNSQR:qtype:replace:45416}),)-| \/", logger)
+    strat = geneva.actions.utils.parse("[IP:ihl:5]-duplicate-| [TCP:options-mss:]-tamper{IP:frag:replace:1353}(fragment{tcp:-1:True}(tamper{TCP:load:replace:}(fragment{tcp:-1:False},),tamper{DNSQR:qtype:replace:45416}),)-| \/", logger)
     strat.act_on_packet(packet, logger)
 
-    strat = actions.utils.parse("[DNSQR:qclass:25989]-duplicate(duplicate(tamper{DNSQR:qtype:replace:30882},),tamper{UDP:sport:replace:42042})-| [TCP:options-nop:]-tamper{TCP:options-nop:corrupt}(tamper{TCP:load:replace:mjkuskjzgy}(tamper{IP:frag:replace:410}(fragment{tcp:-1:True},),),)-| \/", logger)
+    strat = geneva.actions.utils.parse("[DNSQR:qclass:25989]-duplicate(duplicate(tamper{DNSQR:qtype:replace:30882},),tamper{UDP:sport:replace:42042})-| [TCP:options-nop:]-tamper{TCP:options-nop:corrupt}(tamper{TCP:load:replace:mjkuskjzgy}(tamper{IP:frag:replace:410}(fragment{tcp:-1:True},),),)-| \/", logger)
     strat.act_on_packet(packet, logger)
 
 
@@ -245,25 +245,25 @@ def test_fallback(logger):
     assert str(fragment) == "fragment{ip:2:False}", "Fragment returned incorrect string representation: %s" % str(fragment)
 
     fragment.parse("fragment{ip:0:False}", logger)
-    packet = layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1", proto=0x06)/UDP(sport=2222, dport=3333, chksum=0x4444)/("thisissomedata"))
+    packet = geneva.layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1", proto=0x06) / UDP(sport=2222, dport=3333, chksum=0x4444) / ("thisissomedata"))
     packet1, packet2 = fragment.run(packet, logger)
     assert id(packet1) != id(packet2), "Duplicate aliased packet objects"
     assert str(packet1) == str(packet2)
 
     fragment.parse("fragment{tcp:-1:False}", logger)
-    packet = layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1", proto=0x06)/UDP(sport=2222, dport=3333, chksum=0x4444)/("thisissomedata"))
+    packet = geneva.layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1", proto=0x06) / UDP(sport=2222, dport=3333, chksum=0x4444) / ("thisissomedata"))
     packet1, packet2 = fragment.run(packet, logger)
     assert id(packet1) != id(packet2), "Duplicate aliased packet objects"
     assert str(packet1) == str(packet2)
 
     fragment.parse("fragment{tcp:-1:False}", logger)
-    packet = layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1", proto=0x06)/TCP(sport=2222, dport=3333, chksum=0x4444))
+    packet = geneva.layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1", proto=0x06) / TCP(sport=2222, dport=3333, chksum=0x4444))
     packet1, packet2 = fragment.run(packet, logger)
     assert id(packet1) != id(packet2), "Duplicate aliased packet objects"
     assert str(packet1) == str(packet2)
 
     fragment.parse("fragment{ip:-1:False}", logger)
-    packet = layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1", proto=0x06))
+    packet = geneva.layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1", proto=0x06))
     packet1, packet2 = fragment.run(packet, logger)
     assert id(packet1) != id(packet2), "Duplicate aliased packet objects"
     assert str(packet1) == str(packet2)
@@ -276,7 +276,7 @@ def test_ip_only_fragment(logger):
     fragment = actions.fragment.FragmentAction(correct_order=True)
     fragment.parse("fragment{ip:-1:True}", logger)
 
-    packet = layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1")/("datadata11datadata"))
+    packet = geneva.layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1") / ("datadata11datadata"))
     packet1, packet2 = fragment.run(packet, logger)
 
     assert id(packet1) != id(packet2), "Duplicate aliased packet objects"
@@ -293,7 +293,7 @@ def test_overlapping_segment():
     fragment = actions.fragment.FragmentAction(correct_order=True)
     fragment.parse("fragment{tcp:-1:True:4}", logger)
 
-    packet = layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1")/TCP(seq=100)/("datadata11datadata"))
+    packet = geneva.layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1") / TCP(seq=100) / ("datadata11datadata"))
     packet1, packet2 = fragment.run(packet, logger)
 
     assert id(packet1) != id(packet2), "Duplicate aliased packet objects"
@@ -312,7 +312,7 @@ def test_overlapping_segment_no_overlap():
     fragment = actions.fragment.FragmentAction(correct_order=True)
     fragment.parse("fragment{tcp:-1:True:0}", logger)
 
-    packet = layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1")/TCP(seq=100)/("datadata11datadata"))
+    packet = geneva.layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1") / TCP(seq=100) / ("datadata11datadata"))
     packet1, packet2 = fragment.run(packet, logger)
 
     assert id(packet1) != id(packet2), "Duplicate aliased packet objects"
@@ -331,7 +331,7 @@ def test_overlapping_segment_entire_packet():
     fragment = actions.fragment.FragmentAction(correct_order=True)
     fragment.parse("fragment{tcp:-1:True:9}", logger)
 
-    packet = layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1")/TCP(seq=100)/("datadata11datadata"))
+    packet = geneva.layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1") / TCP(seq=100) / ("datadata11datadata"))
     packet1, packet2 = fragment.run(packet, logger)
 
     assert id(packet1) != id(packet2), "Duplicate aliased packet objects"
@@ -350,7 +350,7 @@ def test_overlapping_segment_out_of_bounds():
     fragment = actions.fragment.FragmentAction(correct_order=True)
     fragment.parse("fragment{tcp:-1:True:20}", logger)
 
-    packet = layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1")/TCP(seq=100)/("datadata11datadata"))
+    packet = geneva.layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1") / TCP(seq=100) / ("datadata11datadata"))
     packet1, packet2 = fragment.run(packet, logger)
 
     assert id(packet1) != id(packet2), "Duplicate aliased packet objects"
