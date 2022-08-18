@@ -13,9 +13,9 @@ import netifaces
 # Disable scapy ::1 warnings
 logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
 
-from scapy.all import IP, TCP, wrpcap
+from scapy.all import IP, TCP
 
-from censors.censor import Censor
+from censor import Censor
 
 
 class Censor5(Censor):

@@ -19,7 +19,7 @@ import requests
 
 socket.setdefaulttimeout(1)
 
-import engine
+import geneva.engine
 import external_sites
 import geneva.actions.utils
 
@@ -133,7 +133,7 @@ class HTTPPluginRunner(Plugin):
 
         output_path = os.path.join(PROJECT_ROOT, evaluator.client_args.get("output_directory"))
 
-        with engine.Engine(port, args.get("strategy", ""), server_side=args["server_side"], environment_id=environment["id"], output_directory=output_path, log_level=args.get("log", "debug"), enabled=args["server_side"], forwarder=forwarder) as eng:
+        with geneva.engine.Engine(port, args.get("strategy", ""), server_side=args["server_side"], environment_id=environment["id"], output_directory=output_path, log_level=args.get("log", "debug"), enabled=args["server_side"], forwarder=forwarder) as eng:
             with TestServer(site_to_test, evaluator, environment, logger) as site_to_test:
                 evaluator.client_args.update({"server" : site_to_test})
                 fitness = evaluator.run_client(evaluator.client_args, environment, logger)

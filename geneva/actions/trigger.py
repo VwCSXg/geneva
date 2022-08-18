@@ -6,6 +6,7 @@ import geneva.layers.packet
 FIXED_TRIGGER = None
 GAS_ENABLED = True
 
+
 class Trigger(object):
     def __init__(self, trigger_type, trigger_field, trigger_proto, trigger_value=0, environment_id=None, gas=None):
         """
@@ -32,7 +33,7 @@ class Trigger(object):
         # ignore numerical trigger values
         if isinstance(self.trigger_value, (str)):
             # check if value field is wildcarded or not
-            if(len(self.trigger_value) != 0 and self.trigger_value[-1] == '*'):
+            if len(self.trigger_value) != 0 and self.trigger_value[-1] == '*':
                 self.has_wildcard = True
                 # remove '*' wildcard from trigger_value for ease of use
                 self.trigger_value = self.trigger_value[:-1]
@@ -79,7 +80,6 @@ class Trigger(object):
         """
         Checks if this trigger is applicable to a given packet.
         """
-        will_run = False
         self.num_seen += 1
         if not packet.haslayer(self.trigger_proto):
             return False

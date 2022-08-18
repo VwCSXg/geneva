@@ -12,8 +12,8 @@ import socket
 import random
 import struct
 
-import actions.action
-import actions.trigger
+import geneva.actions.action
+import geneva.actions.trigger
 import geneva.layers.packet
 import geneva.plugins.plugin_client
 import geneva.plugins.plugin_server
@@ -58,7 +58,7 @@ def parse(requested_trees, logger):
         requested_trees = requested_trees[:-1]
 
     # Define a blank strategy to initialize with the user specified string
-    strat = actions.strategy.Strategy([], [])
+    strat = geneva.actions.strategy.Strategy([], [])
 
     # Actions for the in and out forest are separated by a "\/".
     # Split the given string by this token
@@ -87,10 +87,10 @@ def parse(requested_trees, logger):
             # ActionTree uses the last "|" as a sanity check for well-formed
             # strategies, so restore the "|" that was lost from the split
             str_action = str_action + "|"
-            new_tree = actions.tree.ActionTree(direction)
+            new_tree = geneva.actions.tree.ActionTree(direction)
             success = new_tree.parse(str_action, logger)
             if success is False:
-                raise actions.tree.ActionTreeParseError("Failed to parse tree")
+                raise geneva.actions.tree.ActionTreeParseError("Failed to parse tree")
 
             # Once all the actions are parsed, add this tree to the
             # current direction of actions
@@ -310,10 +310,10 @@ def import_plugin(plugin, side):
         Filters class members to ensure we get only enabled Plugin subclasses
         """
         return inspect.isclass(obj) and \
-                issubclass(obj, plugins.plugin.Plugin) and \
+                issubclass(obj, geneva.plugins.plugin.Plugin) and \
                 (obj != geneva.plugins.plugin_client.ClientPlugin and \
                  obj != geneva.plugins.plugin_server.ServerPlugin and \
-                 obj != plugins.plugin.Plugin) and \
+                 obj != geneva.plugins.plugin.Plugin) and \
                 obj(None).enabled
 
     # Filter the class members of the imported module to find our Plugin subclass

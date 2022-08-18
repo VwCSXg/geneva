@@ -1,11 +1,10 @@
-import binascii
-import copy
 import random
 import string
-import os
+import urllib.parse
 import urllib.parse
 
-from scapy.all import IP, RandIP, UDP, DNS, DNSQR, Raw, TCP, fuzz
+from scapy.all import Raw, fuzz
+
 
 class Layer():
     """

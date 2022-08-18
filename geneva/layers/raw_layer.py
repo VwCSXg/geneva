@@ -1,4 +1,4 @@
-from layers.layer import Layer
+from ..layers.layer import Layer
 
 class RawLayer(Layer):
     """

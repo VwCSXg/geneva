@@ -1,10 +1,9 @@
-import socket
 import time
 
 from scapy.config import conf
 
-from actions.action import Action
 import geneva.actions.utils
+from ..actions.action import Action
 
 
 class TraceAction(Action):

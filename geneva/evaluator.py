@@ -18,8 +18,8 @@ import warnings
 import requests
 import urllib3
 
-import actions.utils
-import censors.censor_driver
+import geneva.actions.utils
+import geneva.censors.censor_driver
 
 
 # Suppress unfixed Paramiko warnings (see Paramiko issue #1386)

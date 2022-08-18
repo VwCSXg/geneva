@@ -1,7 +1,7 @@
 import random
 
 import geneva.actions.utils
-import actions.tree
+import geneva.actions.tree
 
 
 class Strategy(object):
@@ -81,19 +81,19 @@ class Strategy(object):
         """
         for _ in range(0, num_in_trees):
             # Define a new in action tree
-            in_tree = actions.tree.ActionTree("in")
+            in_tree = geneva.actions.tree.ActionTree("in")
             # Initialize the in tree
             in_tree.initialize(num_in_actions, self.environment_id, disabled=disabled)
             # Add them to this strategy
-            self.in_actions.append(in_tree)
+            self.in_geneva.actions.append(in_tree)
 
         for _ in range(0, num_out_trees):
             # Define a new out action tree
-            out_tree = actions.tree.ActionTree("out")
+            out_tree = geneva.actions.tree.ActionTree("out")
             # Initialize the out tree
             out_tree.initialize(num_out_actions, self.environment_id, disabled=disabled)
             # Add them to this strategy
-            self.out_actions.append(out_tree)
+            self.out_geneva.actions.append(out_tree)
 
 
     def act_on_packet(self, packet, logger, direction="out"):
@@ -139,7 +139,7 @@ class Strategy(object):
         """
         pick = random.uniform(0, 1)
         if pick < 0.1 or not trees:
-            new_tree = actions.tree.ActionTree(direction)
+            new_tree = geneva.actions.tree.ActionTree(direction)
             new_tree.initialize(1, self.environment_id)
             trees.append(new_tree)
         elif pick < 0.2 and trees:

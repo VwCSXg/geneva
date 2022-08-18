@@ -9,7 +9,7 @@ import anytree
 from anytree.exporter import DotExporter
 
 import geneva.actions.utils
-import actions.trigger
+import geneva.actions.trigger
 
 
 class ActionTreeParseError(Exception):
@@ -44,7 +44,7 @@ class ActionTree():
         if terminal actions are used.
         """
         self.environment_id = environment_id
-        self.trigger = actions.trigger.Trigger(None, None, None, environment_id=environment_id)
+        self.trigger = geneva.actions.trigger.Trigger(None, None, None, environment_id=environment_id)
         if not allow_terminal or random.random() > 0.1:
             allow_terminal = False
 
@@ -140,7 +140,7 @@ class ActionTree():
             left_actions, right_actions = rest[1:idx], rest[idx+1:-1]
 
         # Parse the action_string using action.utils
-        action_obj = actions.action.Action.parse_action(action_string, self.direction, logger)
+        action_obj = geneva.actions.action.Action.parse_action(action_string, self.direction, logger)
         if not action_obj:
             raise ActionTreeParseError("Did not get a legitimate action object from %s" %
                                        action_string)
@@ -189,7 +189,7 @@ class ActionTree():
             return False
 
         # Ask the trigger class to parse this trigger to define a new object
-        trigger = actions.trigger.Trigger.parse(match.group(1))
+        trigger = geneva.actions.trigger.Trigger.parse(match.group(1))
         # If we couldn't parse the trigger, bail
         if not trigger:
             logger.error("Trigger failed to parse")
@@ -411,7 +411,7 @@ class ActionTree():
         Retrieves and initializes a random action that can run in the given direction.
         """
         pick = random.random()
-        action_options = actions.action.Action.get_actions(direction, disabled=disabled, allow_terminal=allow_terminal)
+        action_options = geneva.actions.action.Action.get_actions(direction, disabled=disabled, allow_terminal=allow_terminal)
         # Check to make sure there are still actions available to use
         assert action_options, "No actions were available"
         act_dict = {}

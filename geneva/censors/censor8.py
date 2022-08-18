@@ -7,7 +7,7 @@ import logging
 import geneva.layers.packet
 logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
 
-from censors.censor import Censor
+from censor import Censor
 
 
 class Censor8(Censor):

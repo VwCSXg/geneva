@@ -1,4 +1,4 @@
-from actions.action import Action
+from ..actions.action import Action
 
 
 class DuplicateAction(Action):

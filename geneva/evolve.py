@@ -12,11 +12,11 @@ import random
 import subprocess as sp
 import sys
 
-import actions.strategy
-import actions.tree
-import actions.trigger
-import evaluator
-import layers.packet
+import geneva.actions.strategy
+import geneva.actions.tree
+import geneva.actions.trigger
+import geneva.evaluator
+import geneva.layers.packet
 
 # Grab the terminal size for printing
 try:
@@ -37,10 +37,10 @@ def setup_logger(log_level):
     """
     level = log_level.upper()
     assert level in ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"], "Unknown log level %s" % level
-    actions.utils.CONSOLE_LOG_LEVEL = level.lower()
+    geneva.actions.utils.CONSOLE_LOG_LEVEL = level.lower()
 
     # Setup needed folders
-    ga_log_dir = actions.utils.setup_dirs(actions.utils.RUN_DIRECTORY)
+    ga_log_dir = geneva.actions.utils.setup_dirs(geneva.actions.utils.RUN_DIRECTORY)
 
     ga_log = os.path.join(ga_log_dir, "ga.log")
     ga_debug_log = os.path.join(ga_log_dir, "ga_debug.log")
@@ -50,7 +50,7 @@ def setup_logger(log_level):
     logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', datefmt="%Y-%m-%d %H:%M:%S")
 
     # Set up the root logger
-    logger = logging.getLogger("ga_%s" % actions.utils.RUN_DIRECTORY)
+    logger = logging.getLogger("ga_%s" % geneva.actions.utils.RUN_DIRECTORY)
     logger.setLevel(logging.DEBUG)
     logger.propagate = False
 
@@ -93,7 +93,7 @@ def collect_plugin_args(cmd, plugin, plugin_type, message=None):
     if not message:
         message = plugin_type
     try:
-        _, cls = actions.utils.import_plugin(plugin, plugin_type)
+        _, cls = geneva.actions.utils.import_plugin(plugin, plugin_type)
         print("\n\n")
         print("=" * int(COLUMNS))
         print("Options for --test-type %s %s" % (plugin, message))
@@ -115,7 +115,7 @@ def get_args(cmd):
     """
     parser = argparse.ArgumentParser(description='Genetic algorithm for evolving censorship evasion.\n\nevolve.py uses a pass-through argument system to pass the command line arguments through different files in the system, including the evaluator (evaluator.py) and a given plugin (plugins/). --help will collect all these arguments.', add_help=False, prog="evolve.py")
 
-    parser.add_argument('--test-type', action='store', choices=actions.utils.get_plugins(), default="http", help="plugin to launch")
+    parser.add_argument('--test-type', action='store', choices=geneva.actions.utils.get_plugins(), default="http", help="plugin to launch")
 
     # Add help message separately so we can collect the help messages of all of the other parsers
     parser.add_argument('-h', '--help', action='store_true', default=False, help='print this help message and exit')
@@ -181,7 +181,7 @@ def get_args(cmd):
         print(epilog)
         print("=" * int(COLUMNS))
         print("\nevolve.py uses a pass-through argument system to evaluator.py and other parts of Geneva. These arguments are below.\n\n")
-        evaluator.get_arg_parser(cmd).print_help()
+        geneva.evaluator.get_arg_parser(cmd).print_help()
         if args.test_type:
             collect_plugin_args(cmd, args.test_type, "plugin", message="parent plugin")
             collect_plugin_args(cmd, args.test_type, "client")
@@ -301,10 +301,10 @@ def generate_strategy(logger, num_in_trees, num_out_trees, num_in_actions, num_o
         disabled (str, optional): List of actions that should not be considered in building a new strategy
 
     Returns:
-        :obj:`actions.strategy.Strategy`: A new strategy object
+        :obj:`geneva.actions.strategy.Strategy`: A new strategy object
     """
     try:
-        strat = actions.strategy.Strategy([], [], environment_id=environment_id)
+        strat = geneva.actions.strategy.Strategy([], [], environment_id=environment_id)
         strat.initialize(logger, num_in_trees, num_out_trees, num_in_actions, num_out_actions, seed, disabled=disabled)
     except Exception:
         logger.exception("Failure to generate strategy")
@@ -339,7 +339,7 @@ def mutation_crossover(logger, population, hall, options):
     for i in range(1, len(offspring), 2):
         if random.random() < cxpb:
             ind = offspring[i - 1]
-            actions.strategy.mate(ind, offspring[i], indpb=0.5)
+            geneva.actions.strategy.mate(ind, offspring[i], indpb=0.5)
             offspring[i - 1].fitness, offspring[i].fitness = -1000, -1000
 
     for i in range(len(offspring)):
@@ -375,10 +375,10 @@ def mutate_individual(logger, ind):
 
     Args:
         logger (:obj:`logging.Logger`): A logger to log with
-        ind (:obj:`actions.strategy.Strategy`): A strategy individual to mutate
+        ind (:obj:`geneva.actions.strategy.Strategy`): A strategy individual to mutate
 
     Returns:
-        :obj:`actions.strategy.Strategy`: Mutated individual
+        :obj:`geneva.actions.strategy.Strategy`: Mutated individual
     """
     return ind.mutate(logger)
 
@@ -444,7 +444,7 @@ def load_generation(logger, filename):
 
         # Read each individual from file
         for individual in file:
-            strategy = actions.utils.parse(individual, logger)
+            strategy = geneva.actions.utils.parse(individual, logger)
             population.append(strategy)
 
     return population
@@ -514,7 +514,7 @@ def genetic_solve(logger, options, ga_evaluator):
         dict: Hall of fame of individuals
     """
     # Directory to save off each generation so evolution can be resumed
-    ga_generations_dir = os.path.join(actions.utils.RUN_DIRECTORY, "generations")
+    ga_generations_dir = os.path.join(geneva.actions.utils.RUN_DIRECTORY, "generations")
 
     hall = {}
     canary_id = None
@@ -529,7 +529,7 @@ def genetic_solve(logger, options, ga_evaluator):
         offspring = []
         elite_clones = []
         if options["seed"]:
-            elite_clones = [actions.utils.parse(options["seed"], logger)]
+            elite_clones = [geneva.actions.utils.parse(options["seed"], logger)]
 
         # Evolution over given number of generations
         for gen in range(options["num_generations"]):
@@ -673,7 +673,7 @@ def eval_only(logger, requested, ga_evaluator, runs=1):
 
     for requested in requested_strategies:
         for i in range(runs):
-            ind = actions.utils.parse(requested, logger)
+            ind = geneva.actions.utils.parse(requested, logger)
             population.append(ind)
         logging.info("Computing fitness for: %s", str(ind))
         logging.info("\n%s", ind.pretty_print())
@@ -757,8 +757,8 @@ def driver(cmd):
         # Define an evaluator for this session
         ga_evaluator = None
         if not args.no_eval:
-            cmd += ["--output-directory", actions.utils.RUN_DIRECTORY]
-            ga_evaluator = evaluator.Evaluator(cmd, logger)
+            cmd += ["--output-directory", geneva.actions.utils.RUN_DIRECTORY]
+            ga_evaluator = geneva.evaluator.Evaluator(cmd, logger)
 
         # Check if the user only wanted to evaluate a single given strategy
         # If so, evaluate it, and exit
@@ -770,15 +770,15 @@ def driver(cmd):
 
         restrict_headers(logger, args.protos, args.fields, args.disable_fields)
 
-        actions.trigger.GAS_ENABLED = (not args.no_gas)
+        geneva.actions.trigger.GAS_ENABLED = (not args.no_gas)
         if args.fix_trigger:
-            actions.trigger.FIXED_TRIGGER = actions.trigger.Trigger.parse(args.fix_trigger)
+            geneva.actions.trigger.FIXED_TRIGGER = geneva.actions.trigger.Trigger.parse(args.fix_trigger)
 
         requested_seed = args.seed
         if requested_seed or requested_seed == "":
             try:
-                requested_seed = actions.utils.parse(args.seed, logger)
-            except (TypeError, AssertionError, actions.tree.ActionTreeParseError):
+                requested_seed = geneva.actions.utils.parse(args.seed, logger)
+            except (TypeError, AssertionError, geneva.actions.tree.ActionTreeParseError):
                 logger.error("Failed to parse given strategy: %s", requested_seed)
                 raise
 

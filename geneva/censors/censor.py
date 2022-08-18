@@ -1,7 +1,6 @@
 import socket
 socket.setdefaulttimeout(1)
 import logging
-import random
 import os
 
 import geneva.layers.packet

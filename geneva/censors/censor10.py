@@ -10,7 +10,7 @@ work.
 
 import netifaces
 import geneva.layers.packet
-from censors.censor import Censor
+from censor import Censor
 from scapy.all import raw, IP, TCP
 
 

@@ -1,5 +1,5 @@
 import random
-from actions.action import Action
+from ..actions.action import Action
 import geneva.layers.packet
 
 from scapy.all import IP, TCP, fragment

@@ -10,12 +10,10 @@ modifications (particularly header modifications). It supports the following pri
 - compress: performs DNS decompression on the packet (if applicable)
 """
 
-from actions.action import Action
-import geneva.actions.utils
-from layers.dns_layer import DNSLayer
-
 import random
 
+import geneva.actions.utils
+from geneva.actions.action import Action
 
 # All supported tamper primitives
 SUPPORTED_PRIMITIVES = ["corrupt", "replace", "add", "compress"]

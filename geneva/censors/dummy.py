@@ -6,7 +6,7 @@ Designed to be run by the evaluator.
 Censors nothing - dummy censor for infrastructure testing.  
 """
 
-from censors.censor import Censor
+from censor import Censor
 
 
 class Dummy(Censor):

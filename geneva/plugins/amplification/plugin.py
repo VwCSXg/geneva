@@ -117,7 +117,7 @@ class AmplificationPluginRunner(Plugin):
                 IP(dst=dst)/TCP(sport=sport, dport=dport, flags="A", ack=ack, seq=seq+1),
                 IP(dst=dst)/TCP(sport=sport, dport=dport, flags="PA", ack=ack, seq=seq+1)/Raw(payload)
             ]
-            packets = [actions.packet.Packet(packet) for packet in packets]
+            packets = [geneva.actions.packet.Packet(packet) for packet in packets]
 
             packets_to_send = []
             try:

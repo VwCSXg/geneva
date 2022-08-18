@@ -25,9 +25,9 @@ from scapy.config import conf
 
 socket.setdefaulttimeout(1)
 
-import layers.packet
-import actions.strategy
-import actions.utils
+import geneva.layers.packet
+import geneva.actions.strategy
+import geneva.actions.utils
 
 BASEPATH = os.path.dirname(os.path.abspath(__file__))
 

@@ -11,7 +11,7 @@ PROJECT_ROOT = os.path.dirname(BASEPATH)
 if PROJECT_ROOT not in sys.path:
     sys.path.append(PROJECT_ROOT)
 
-import censors.censor
+import censor
 
 CENSORS = {}
 
@@ -30,7 +30,7 @@ def get_censors():
         censor_file = censor_file.replace(".py", "")
         importlib.import_module("censors."+censor_file)
         def check_censor(o):
-            return inspect.isclass(o) and issubclass(o, censors.censor.Censor) and o != censors.censor.Censor
+            return inspect.isclass(o) and issubclass(o, censor.Censor) and o != censor.Censor
         clsmembers = inspect.getmembers(sys.modules["censors."+censor_file], predicate=check_censor)
         if clsmembers:
             name, censor_class = clsmembers[0]

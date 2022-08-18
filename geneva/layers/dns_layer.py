@@ -1,5 +1,5 @@
 import random
-from layers.layer import Layer
+from ..layers.layer import Layer
 from scapy.all import DNS
 
 class DNSLayer(Layer):

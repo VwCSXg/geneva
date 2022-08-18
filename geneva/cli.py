@@ -1,5 +1,5 @@
 import argparse
-import engine
+from geneva import engine
 
 
 def main():
@@ -7,7 +7,7 @@ def main():
     subparsers = parser.add_subparsers()
 
     run_parser = subparsers.add_parser("engine", parents=[engine.parser], add_help=False)
-    run_parser.set_defaults(func=engine)
+    run_parser.set_defaults(func=engine.main)
 
     args = parser.parse_args()
     args.func(args)

@@ -7,7 +7,7 @@ yet aware of, but does not check the checksums of incoming packets.
 
 import geneva.layers.packet
 import netifaces
-from censors.censor import Censor
+from censor import Censor
 from scapy.all import IP, TCP
 
 

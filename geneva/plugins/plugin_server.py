@@ -11,8 +11,8 @@ BASEPATH = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(BASEPATH)
 sys.path.append(PROJECT_ROOT)
 
-import actions.sniffer
-import engine
+import geneva.actions.sniffer
+import geneva.engine
 
 from geneva.plugins.plugin import Plugin
 
@@ -34,7 +34,7 @@ class ServerPlugin(Plugin):
         """
         # Do not add a help message; this allows us to collect the arguments from server plugins
         parser = argparse.ArgumentParser(description='Server plugin runner', allow_abbrev=False, add_help=False)
-        parser.add_argument('--test-type', action='store', choices=actions.utils.get_plugins(), default="http", help="plugin to launch")
+        parser.add_argument('--test-type', action='store', choices=geneva.actions.utils.get_plugins(), default="http", help="plugin to launch")
         parser.add_argument('--environment-id', action='store', help="ID of the current environment")
         parser.add_argument('--output-directory', action='store', help="Where to output results")
         parser.add_argument('--no-engine', action="store_true",
@@ -91,10 +91,10 @@ class ServerPlugin(Plugin):
         # doing its thing. If we used the context managers, they would be cleaned up on method exit.
 
         # Start a sniffer to capture traffic that the plugin generates
-        self.sniffer = actions.sniffer.Sniffer(pcap_filename, int(port), logger).__enter__()
+        self.sniffer = geneva.actions.sniffer.Sniffer(pcap_filename, int(port), logger).__enter__()
 
         # Conditionally initialize the engine
-        self.engine = engine.Engine(port, strategy, server_side=True, environment_id=eid, output_directory=output_path, log_level=args.get("log", "info"), enabled=use_engine, forwarder=forwarder).__enter__()
+        self.engine = geneva.engine.Engine(port, strategy, server_side=True, environment_id=eid, output_directory=output_path, log_level=args.get("log", "info"), enabled=use_engine, forwarder=forwarder).__enter__()
 
         # Run the plugin
         self.server_proc = multiprocessing.Process(target=self.start_thread, args=(args, logger))
@@ -180,7 +180,7 @@ class ServerPlugin(Plugin):
         """
         Punish fitness.
         """
-        return actions.utils.punish_fitness(fitness, logger, self.engine)
+        return geneva.actions.utils.punish_fitness(fitness, logger, self.engine)
 
 
 def main(command):
@@ -191,7 +191,7 @@ def main(command):
     plugin = ServerPlugin.get_args(command)["test_type"]
 
     # Import that plugin
-    mod, cls = actions.utils.import_plugin(plugin, "server")
+    mod, cls = geneva.actions.utils.import_plugin(plugin, "server")
 
     # Ask the plugin to parse the args
     plugin_args = cls.get_args(command)
@@ -200,7 +200,7 @@ def main(command):
     server_plugin = cls(plugin_args)
 
     # Define a logger and launch the plugin
-    with actions.utils.Logger(plugin_args["output_directory"], __name__, "server", plugin_args["environment_id"], log_level=plugin_args["log"]) as logger:
+    with geneva.actions.utils.Logger(plugin_args["output_directory"], __name__, "server", plugin_args["environment_id"], log_level=plugin_args["log"]) as logger:
         server_plugin.start(plugin_args, logger)
 
 if __name__ == "__main__":

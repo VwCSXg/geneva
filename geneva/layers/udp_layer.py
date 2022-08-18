@@ -1,4 +1,4 @@
-from layers.layer import Layer
+from ..layers.layer import Layer
 from scapy.all import UDP
 
 class UDPLayer(Layer):

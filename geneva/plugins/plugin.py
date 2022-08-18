@@ -1,15 +1,7 @@
-import argparse
-import copy
 import os
-import logging
-import subprocess
-import sys
 
 BASEPATH = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(BASEPATH)
-
-import actions.sniffer
-import geneva.actions.utils
 
 
 class Plugin():

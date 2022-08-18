@@ -7,9 +7,8 @@ Dropping censor that synchronizes TCB on all SYN and ACK packets.
 import geneva.layers.packet
 import logging
 logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
-from scapy.all import IP, TCP
 
-from censors.censor import Censor
+from censor import Censor
 
 
 class Censor4(Censor):

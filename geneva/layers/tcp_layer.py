@@ -1,7 +1,7 @@
 import os
 import random
 import binascii
-from layers.layer import Layer
+from ..layers.layer import Layer
 from scapy.all import TCP, fuzz
 
 class TCPLayer(Layer):

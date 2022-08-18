@@ -11,7 +11,7 @@ before the 3-way handshake has finished.
 
 import geneva.layers.packet
 import netifaces
-from censors.censor import Censor
+from censor import Censor
 from scapy.all import raw, IP, TCP
 
 

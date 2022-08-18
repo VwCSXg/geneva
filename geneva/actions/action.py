@@ -117,8 +117,8 @@ class Action():
             importlib.import_module("actions." + action)
             def check_action(obj):
                 return inspect.isclass(obj) and \
-                        issubclass(obj, actions.action.Action) and \
-                        obj != actions.action.Action and \
+                        issubclass(obj, geneva.actions.action.Action) and \
+                        obj != geneva.actions.action.Action and \
                         obj().applies(direction) and \
                         obj().enabled and \
                         not any([x in str(obj) for x in disabled]) and \
