@@ -27,8 +27,6 @@ warnings.filterwarnings(action='ignore',module='.*paramiko.*')
 
 # Placeholder for a docker import (see below why we cannot import docker here)
 docker = None
-BASEPATH = os.path.dirname(os.path.abspath(__file__))
-PROJECT_ROOT = BASEPATH
 
 
 class Evaluator():
@@ -93,7 +91,7 @@ class Evaluator():
         self.workers = self.args["workers"]
         self.stop = False
         self.skip_empty = not self.args["no_skip_empty"]
-        self.output_directory = self.args["output_directory"]
+        self.output_directory = os.path.abspath(self.args["output_directory"])
 
         self.routing_ip = self.args.get("routing_ip", None)
         self.runs = self.args.get("runs", 1)
@@ -300,7 +298,7 @@ class Evaluator():
         else:
             self.run_local_client(args, environment, logger)
 
-        fitpath = os.path.join(BASEPATH, self.output_directory, geneva.actions.utils.FLAGFOLDER, environment["id"]) + ".fitness"
+        fitpath = os.path.join(self.output_directory, geneva.actions.utils.FLAGFOLDER, environment["id"]) + ".fitness"
         # Do not overwrite the fitness if it already exists
         if not os.path.exists(fitpath):
             geneva.actions.utils.write_fitness(fitness, self.output_directory, environment["id"])
@@ -616,7 +614,7 @@ class Evaluator():
         """
         server = self.server_cls(args)
         logger.debug("Starting local server with args: %s" % str(args))
-        server_logger = geneva.actions.utils.get_logger(PROJECT_ROOT, args["output_directory"], "server", "server", environment["id"], log_level=geneva.actions.utils.get_console_log_level())
+        server_logger = geneva.actions.utils.get_logger(self.output_directory, "server", "server", environment["id"], log_level=geneva.actions.utils.get_console_log_level())
         environment["server_logger"] = server_logger
         args.update({"test_type": self.server_cls.name})
         if not args.get("server_side"):
@@ -841,8 +839,7 @@ class Evaluator():
         log_files = ["client.log", "engine.log", "censor.log", "server.log"]
         for log_file in log_files:
             log = ""
-            log_path = os.path.join(BASEPATH,
-                                    self.output_directory,
+            log_path = os.path.join(self.output_directory,
                                     "logs",
                                     "%s.%s" % (environment_id, log_file))
             try:
@@ -1010,7 +1007,7 @@ class Evaluator():
         Args:
             ind (:obj:`actions.strategy.Strategy`): Individual to read fitness for
         """
-        fitness_path = os.path.join(BASEPATH, self.output_directory, geneva.actions.utils.FLAGFOLDER, ind.environment_id + ".fitness")
+        fitness_path = os.path.join(self.output_directory, geneva.actions.utils.FLAGFOLDER, ind.environment_id + ".fitness")
         try:
             if os.path.exists(fitness_path):
                 with open(fitness_path, "r") as fd:
@@ -1137,7 +1134,7 @@ def get_arg_parser(single_use=False):
     networking_group.add_argument('--port', action='store', type=int, default=get_random_open_port(), help='default port to use')
 
     docker_group = parser.add_argument_group('control aspects of docker-specific options')
-    docker_group.add_argument('--censor', action='store', help='censor to test against.', choices=censors.censor_driver.get_censors())
+    docker_group.add_argument('--censor', action='store', help='censor to test against.', choices=geneva.censors.censor_driver.get_censors())
     docker_group.add_argument('--workers', action='store', default=1, type=int, help='controls the number of docker containers the evaluator will use.')
     docker_group.add_argument('--bad-word', action='store', help="forbidden word to test with", default="ultrasurf")
 
