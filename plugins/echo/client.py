@@ -18,7 +18,7 @@ import requests
 
 socket.setdefaulttimeout(1)
 
-import actions.utils
+import geneva.actions.utils
 
 from plugins.plugin_client import ClientPlugin
 

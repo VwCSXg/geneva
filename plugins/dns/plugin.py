@@ -21,7 +21,7 @@ import requests
 
 socket.setdefaulttimeout(1)
 
-import actions.utils
+import geneva.actions.utils
 
 from plugins.plugin import Plugin
 
@@ -104,12 +104,12 @@ class DNSPluginRunner(Plugin):
                 ind.fitness += 40
 
             output_path = os.path.join(PROJECT_ROOT, evaluator.client_args.get("output_directory"))
-            fitpath = os.path.join(PROJECT_ROOT, output_path, actions.utils.FLAGFOLDER, environment["id"]) + ".fitness"
+            fitpath = os.path.join(PROJECT_ROOT, output_path, geneva.actions.utils.FLAGFOLDER, environment["id"]) + ".fitness"
             with open(fitpath, "w") as fitfile:
                 fitfile.write(str(ind.fitness))
 
         if evaluator.args["external_client"]:
-            command = 'cat %s/%s/%s/%s.dnsresult' % (environment["worker"]["geneva_path"], evaluator.args["output_directory"], actions.utils.FLAGFOLDER, environment["id"])
+            command = 'cat %s/%s/%s/%s.dnsresult' % (environment["worker"]["geneva_path"], evaluator.args["output_directory"], geneva.actions.utils.FLAGFOLDER, environment["id"])
             dns_result, error_lines = evaluator.remote_exec_cmd(environment["remote"], command, logger)
             if not dns_result:
                 logger.debug("Failed to get DNS result.")
@@ -120,7 +120,7 @@ class DNSPluginRunner(Plugin):
                 if not self.check_legit_ip(result, logger, domain="facebook"):
                     ind.fitness = -360
                     output_path = os.path.join(PROJECT_ROOT, evaluator.client_args.get("output_directory"))
-                    fitpath = os.path.join(PROJECT_ROOT, output_path, actions.utils.FLAGFOLDER, environment["id"]) + ".fitness"
+                    fitpath = os.path.join(PROJECT_ROOT, output_path, geneva.actions.utils.FLAGFOLDER, environment["id"]) + ".fitness"
                     with open(fitpath, "w") as fitfile:
                         fitfile.write(str(ind.fitness))
 

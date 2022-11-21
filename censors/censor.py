@@ -5,7 +5,7 @@ import random
 import os
 
 import layers.packet
-import actions.utils
+import geneva.actions.utils
 
 # Squelch annoying scapy ::1 runtime errors
 logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
@@ -38,7 +38,7 @@ class Censor(object):
         self.logger = None
         self.log_dir = log_dir
         if log_level:
-            self.logger = actions.utils.get_logger(BASEPATH, log_dir, __name__, "censor", eid, log_level=log_level)
+            self.logger = geneva.actions.utils.get_logger(BASEPATH, log_dir, __name__, "censor", eid, log_level=log_level)
             self.logger.debug("Censor created to port %d on queue %d" % (port, queue_num))
 
     def start(self):
@@ -74,7 +74,7 @@ class Censor(object):
         """
         Check if a shutdown flag has been written.
         """
-        flag_folder = os.path.join(BASEPATH, self.log_dir, actions.utils.FLAGFOLDER)
+        flag_folder = os.path.join(BASEPATH, self.log_dir, geneva.actions.utils.FLAGFOLDER)
         if not os.path.exists(flag_folder):
             os.makedirs(flag_folder)
         return os.path.exists(os.path.join(flag_folder, "shutdown"))
@@ -139,7 +139,7 @@ class Censor(object):
             # Check for control check packet from evaluator to announce readiness
             if scapy_packet.sport == 2222 and scapy_packet.seq == 13337:
                 # This line cannot be removed - it is to signal to the client the censor is ready
-                flag_folder = os.path.join(BASEPATH, self.log_dir, actions.utils.FLAGFOLDER)
+                flag_folder = os.path.join(BASEPATH, self.log_dir, geneva.actions.utils.FLAGFOLDER)
                 if not os.path.exists(flag_folder):
                     os.makedirs(flag_folder)
                 ready_path = os.path.join(flag_folder, "%s.censor_ready" % self.eid)

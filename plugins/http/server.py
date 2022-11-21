@@ -4,7 +4,7 @@ import os
 import tempfile
 import subprocess
 
-import actions.utils
+import geneva.actions.utils
 from plugins.plugin_server import ServerPlugin
 
 BASEPATH = os.path.dirname(os.path.abspath(__file__))
@@ -51,7 +51,7 @@ class HTTPServer(ServerPlugin):
         stdout, stderr = subprocess.DEVNULL, subprocess.DEVNULL
 
         # If we're in debug mode, don't send output to /dev/null
-        if actions.utils.get_console_log_level() == "debug":
+        if geneva.actions.utils.get_console_log_level() == "debug":
             stdout, stderr = None, None
 
         # Start the server

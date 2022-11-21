@@ -10,9 +10,8 @@ modifications (particularly header modifications). It supports the following pri
 - compress: performs DNS decompression on the packet (if applicable)
 """
 
-from actions.action import Action
-import actions.utils
-from layers.dns_layer import DNSLayer
+from geneva.actions.action import Action
+import geneva.actions.utils
 
 import random
 
@@ -43,7 +42,7 @@ class TamperAction(Action):
         Action.__init__(self, "tamper", "both")
         self.field = field
         self.tamper_value = tamper_value
-        self.tamper_proto = actions.utils.string_to_protocol(tamper_proto)
+        self.tamper_proto = geneva.actions.utils.string_to_protocol(tamper_proto)
         self.tamper_proto_str = tamper_proto
 
         self.tamper_type = tamper_type
@@ -71,7 +70,7 @@ class TamperAction(Action):
         self.tamper_type = random.choice(ACTIVATED_PRIMITIVES)
         if self.tamper_type == "compress":
             self.tamper_proto_str = "DNS"
-            self.tamper_proto = actions.utils.string_to_protocol(self.tamper_proto_str)
+            self.tamper_proto = geneva.actions.utils.string_to_protocol(self.tamper_proto_str)
             self.field = "qd"
 
     def _mutate(self, environment_id):
@@ -81,7 +80,7 @@ class TamperAction(Action):
          - a fuzzed packet with 50% probability
         """
         # Retrieve a new protocol and field options for this protocol
-        proto, field, value = actions.utils.get_from_fuzzed_or_real_packet(environment_id, 0.5)
+        proto, field, value = geneva.actions.utils.get_from_fuzzed_or_real_packet(environment_id, 0.5)
         self.tamper_proto = proto
         self.tamper_proto_str = proto.__name__
         self.field = field
@@ -167,7 +166,7 @@ class TamperAction(Action):
         params = string.split(":")
         if num_parameters == 3:
             self.tamper_proto_str, self.field, self.tamper_type, self.tamper_value = params
-            self.tamper_proto = actions.utils.string_to_protocol(self.tamper_proto_str)
+            self.tamper_proto = geneva.actions.utils.string_to_protocol(self.tamper_proto_str)
             if "options" in self.field:
                 if not self.tamper_value:
                     self.tamper_value = '' # An empty string instead of an empty byte literal
@@ -181,6 +180,6 @@ class TamperAction(Action):
                 pass
         else:
             self.tamper_proto_str, self.field, self.tamper_type = params
-            self.tamper_proto = actions.utils.string_to_protocol(self.tamper_proto_str)
+            self.tamper_proto = geneva.actions.utils.string_to_protocol(self.tamper_proto_str)
 
         return True

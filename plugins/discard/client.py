@@ -26,7 +26,7 @@ import requests
 
 socket.setdefaulttimeout(10)
 
-import actions.utils
+import geneva.actions.utils
 
 from plugins.plugin_client import ClientPlugin
 
@@ -168,4 +168,3 @@ class DiscardClient(ClientPlugin):
             logger.debug("Client finished discard test.")
             signal.alarm(0)
         return fitness * 4
-

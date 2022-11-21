@@ -17,7 +17,7 @@ import urllib.request
 import dns.resolver
 import requests
 
-import actions.utils
+import geneva.actions.utils
 from plugins.plugin_client import ClientPlugin
 
 
@@ -86,7 +86,7 @@ class DNSClient(ClientPlugin):
         """
         # Make the path an absolute path
         if not output_dir.startswith("/"):
-            output_dir = os.path.join(actions.utils.PROJECT_ROOT, output_dir)
+            output_dir = os.path.join(geneva.actions.utils.PROJECT_ROOT, output_dir)
 
         resolver = dns.resolver.Resolver()
         protocol = "UDP"

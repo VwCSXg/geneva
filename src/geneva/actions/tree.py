@@ -1,5 +1,5 @@
 """
-Defines an action tree. Action trees are comprised of a trigger and a tree of actions.
+Defines an action tree. Action trees are comprised of a trigger and a tree of geneva.actions.
 """
 
 import random
@@ -8,8 +8,8 @@ import re
 import anytree
 from anytree.exporter import DotExporter
 
-import actions.utils
-import actions.trigger
+import geneva.actions.utils
+import geneva.actions.trigger
 
 
 class ActionTreeParseError(Exception):
@@ -29,7 +29,7 @@ class ActionTree():
 
         Args:
             direction (str): Direction this tree is facing ("out", "in")
-            trigger (:obj:`actions.trigger.Trigger`): Trigger to use with this tree
+            trigger (:obj:`geneva.actions.trigger.Trigger`): Trigger to use with this tree
         """
         self.trigger = trigger
         self.action_root = None
@@ -39,12 +39,12 @@ class ActionTree():
 
     def initialize(self, num_actions, environment_id, allow_terminal=True, disabled=None):
         """
-        Sets up this action tree with a given number of random actions.
+        Sets up this action tree with a given number of random geneva.actions.
         Note that the returned action trees may have less actions than num_actions
         if terminal actions are used.
         """
         self.environment_id = environment_id
-        self.trigger = actions.trigger.Trigger(None, None, None, environment_id=environment_id)
+        self.trigger = geneva.actions.trigger.Trigger(None, None, None, environment_id=environment_id)
         if not allow_terminal or random.random() > 0.1:
             allow_terminal = False
 
@@ -118,7 +118,7 @@ class ActionTree():
             action_string, rest = string[:subtree_idx], string[subtree_idx:]
 
             # We need to split the remaining string at the correct comma that splits this subtree's
-            # left and right actions. To find the correct comma to split on, we need to find the
+            # left and right geneva.actions. To find the correct comma to split on, we need to find the
             # comma that splits the current tree 'in the middle' - where the depth is the number of
             # splits.  This occurs when we cound the same number of commas as open parenthesis "(".
             depth = 0
@@ -140,7 +140,7 @@ class ActionTree():
             left_actions, right_actions = rest[1:idx], rest[idx+1:-1]
 
         # Parse the action_string using action.utils
-        action_obj = actions.action.Action.parse_action(action_string, self.direction, logger)
+        action_obj = geneva.actions.action.Action.parse_action(action_string, self.direction, logger)
         if not action_obj:
             raise ActionTreeParseError("Did not get a legitimate action object from %s" %
                                        action_string)
@@ -189,7 +189,7 @@ class ActionTree():
             return False
 
         # Ask the trigger class to parse this trigger to define a new object
-        trigger = actions.trigger.Trigger.parse(match.group(1))
+        trigger = geneva.actions.trigger.Trigger.parse(match.group(1))
         # If we couldn't parse the trigger, bail
         if not trigger:
             logger.error("Trigger failed to parse")
@@ -411,7 +411,7 @@ class ActionTree():
         Retrieves and initializes a random action that can run in the given direction.
         """
         pick = random.random()
-        action_options = actions.action.Action.get_actions(direction, disabled=disabled, allow_terminal=allow_terminal)
+        action_options = geneva.actions.action.Action.get_actions(direction, disabled=disabled, allow_terminal=allow_terminal)
         # Check to make sure there are still actions available to use
         assert action_options, "No actions were available"
         act_dict = {}

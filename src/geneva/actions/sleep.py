@@ -1,4 +1,4 @@
-from actions.action import Action
+from geneva.actions.action import Action
 
 
 class SleepAction(Action):

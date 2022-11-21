@@ -41,7 +41,7 @@ BASEPATH = os.path.dirname(os.path.abspath(__file__))
 
 # Utils
 import datetime
-import actions.utils
+import geneva.actions.utils
 import logging
 
 # Default values

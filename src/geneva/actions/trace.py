@@ -1,10 +1,9 @@
-import socket
 import time
 
 from scapy.config import conf
 
-from actions.action import Action
-import actions.utils
+from geneva.actions.action import Action
+import geneva.actions.utils
 
 
 class TraceAction(Action):
@@ -36,7 +35,7 @@ class TraceAction(Action):
         # get generated, only allow this action to run once
         self.ran = False
         # Define a socket
-        self.socket = conf.L3socket(iface=actions.utils.get_interface())
+        self.socket = conf.L3socket(iface=geneva.actions.utils.get_interface())
 
     def run(self, packet, logger):
         """

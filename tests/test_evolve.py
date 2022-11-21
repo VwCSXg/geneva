@@ -11,9 +11,9 @@ import library
 import common
 import evolve
 import evaluator
-import actions.utils
+import geneva.actions.utils
 import layers.packet
-from actions.tamper import TamperAction
+from geneva.actions.tamper import TamperAction
 from scapy.all import IP, TCP, UDP
 import random
 
@@ -53,18 +53,18 @@ def test_disable_single_action(logger):
      layers.packet.Packet.reset_restrictions()
      try:
          logger.setLevel("ERROR")
-         actions.action.ACTION_CACHE={}
-         actions.action.ACTION_CACHE["in"] = {}
-         actions.action.ACTION_CACHE["out"] = {}
+         geneva.actions.action.ACTION_CACHE={}
+         geneva.actions.action.ACTION_CACHE["in"] = {}
+         geneva.actions.action.ACTION_CACHE["out"] = {}
          disable_actions=["fragment", "drop", "tamper", "duplicate"]
          for action in disable_actions:
              print("Testing disable %s" % (str(action)))
              for i in range(0, 2000):
                  p = evolve.generate_strategy(logger, 0, 2, 0, 4, None, disabled=[action])
                  assert str(action) not in str(p)
-             actions.action.ACTION_CACHE={}
-             actions.action.ACTION_CACHE["in"] = {}
-             actions.action.ACTION_CACHE["out"] = {}
+             geneva.actions.action.ACTION_CACHE={}
+             geneva.actions.action.ACTION_CACHE["in"] = {}
+             geneva.actions.action.ACTION_CACHE["out"] = {}
      finally:
          layers.packet.Packet.reset_restrictions()
 
@@ -76,9 +76,9 @@ def test_disable_multiple_actions(logger):
     layers.packet.Packet.reset_restrictions()
     try:
         logger.setLevel("ERROR")
-        actions.action.ACTION_CACHE={}
-        actions.action.ACTION_CACHE["in"] = {}
-        actions.action.ACTION_CACHE["out"] = {}
+        geneva.actions.action.ACTION_CACHE={}
+        geneva.actions.action.ACTION_CACHE["in"] = {}
+        geneva.actions.action.ACTION_CACHE["out"] = {}
         disable_actions=["fragment", "drop", "tamper", "duplicate"]
         for num in range(0,10):
             action1 = disable_actions[random.randint(0,3)]
@@ -91,9 +91,9 @@ def test_disable_multiple_actions(logger):
                 assert str(action1) not in str(p)
                 assert str(action2) not in str(p)
                 assert str(action3) not in str(p)
-            actions.action.ACTION_CACHE={}
-            actions.action.ACTION_CACHE["in"] = {}
-            actions.action.ACTION_CACHE["out"] = {}
+            geneva.actions.action.ACTION_CACHE={}
+            geneva.actions.action.ACTION_CACHE["in"] = {}
+            geneva.actions.action.ACTION_CACHE["out"] = {}
     finally:
         layers.packet.Packet.reset_restrictions()
 
@@ -138,11 +138,11 @@ def test_disable_fields(logger, use_canary):
         if use_canary:
             cmd = [
                 "--test-type", "http",
-                "--log", actions.utils.CONSOLE_LOG_LEVEL,
+                "--log", geneva.actions.utils.CONSOLE_LOG_LEVEL,
                 "--use-external-sites",
                 "--no-skip-empty",
                 "--bad-word", "facebook",
-                "--output-directory", actions.utils.RUN_DIRECTORY
+                "--output-directory", geneva.actions.utils.RUN_DIRECTORY
             ]
             tester = evaluator.Evaluator(cmd, logger)
             canary_id = evolve.run_collection_phase(logger, tester)
@@ -171,11 +171,11 @@ def test_disable_fields(logger, use_canary):
         if use_canary:
             cmd = [
                 "--test-type", "http",
-                "--log", actions.utils.CONSOLE_LOG_LEVEL,
+                "--log", geneva.actions.utils.CONSOLE_LOG_LEVEL,
                 "--use-external-sites",
                 "--no-skip-empty",
                 "--bad-word", "facebook",
-                "--output-directory", actions.utils.RUN_DIRECTORY
+                "--output-directory", geneva.actions.utils.RUN_DIRECTORY
             ]
             tester = evaluator.Evaluator(cmd, logger)
             canary_id = evolve.run_collection_phase(logger, tester)
@@ -212,10 +212,10 @@ def test_population_pool(logger, use_canary):
         cmd = [
             "--test-type", "echo",
             "--censor", "censor2",
-            "--log", actions.utils.CONSOLE_LOG_LEVEL,
+            "--log", geneva.actions.utils.CONSOLE_LOG_LEVEL,
             "--no-skip-empty",
             "--bad-word", "facebook",
-            "--output-directory", actions.utils.RUN_DIRECTORY
+            "--output-directory", geneva.actions.utils.RUN_DIRECTORY
         ]
         tester = evaluator.Evaluator(cmd, logger)
         canary_id = evolve.run_collection_phase(logger, tester)
@@ -270,10 +270,10 @@ def test_eval_only(logger):
         "--test-type", "http",
         "--censor", "censor2",
         "--server", "http://facebook.com",
-        "--log", actions.utils.CONSOLE_LOG_LEVEL,
+        "--log", geneva.actions.utils.CONSOLE_LOG_LEVEL,
         "--no-skip-empty",
         "--bad-word", "facebook",
-        "--output-directory", actions.utils.RUN_DIRECTORY
+        "--output-directory", geneva.actions.utils.RUN_DIRECTORY
     ]
     tester = evaluator.Evaluator(cmd, logger)
 
@@ -306,10 +306,10 @@ def test_mutation(logger):
     """
 
     layers.packet.Packet.reset_restrictions()
-    population = [actions.utils.parse("[TCP:flags:PA]-| \/", logger)]
+    population = [geneva.actions.utils.parse("[TCP:flags:PA]-| \/", logger)]
     population[0].in_enabled = False
     assert population
-    assert str(actions.utils.parse(str(population[0]), logger)) == str(population[0])
+    assert str(geneva.actions.utils.parse(str(population[0]), logger)) == str(population[0])
     # Create a hall with a strategy that has failed 5x, but not yet 10x
     hall = { "[TCP:flags:PA]-drop-| \/ ": [-400] * 5 }
     options = {
@@ -326,7 +326,7 @@ def test_mutation(logger):
     else:
         pytest.fail("Never mutated to test strategy")
     print("Rejecting future mutations to [TCP:flags:PA]-drop-| \\/ ")
-    stred = str(actions.utils.parse("[TCP:flags:PA]-drop-| \/", logger))
+    stred = str(geneva.actions.utils.parse("[TCP:flags:PA]-drop-| \/", logger))
     hall = { "[TCP:flags:PA]-drop-| \\/ ": [-400] * 11 }
     assert stred in hall
     for _ in range(0, 2000):
@@ -346,10 +346,10 @@ def test_driver(logger):
         "--test-type", "http",
         "--port", "80",
         "--censor", "censor2",
-        "--log", actions.utils.CONSOLE_LOG_LEVEL,
+        "--log", geneva.actions.utils.CONSOLE_LOG_LEVEL,
         "--no-skip-empty",
         "--bad-word", "facebook",
-        "--output-directory", actions.utils.RUN_DIRECTORY
+        "--output-directory", geneva.actions.utils.RUN_DIRECTORY
     ]
     try:
         evolve.driver(cmd)
@@ -368,11 +368,11 @@ def test_driver_lock_file(logger):
         "--test-type", "http",
         "--port", "80",
         "--censor", "censor2",
-        "--log", actions.utils.CONSOLE_LOG_LEVEL,
+        "--log", geneva.actions.utils.CONSOLE_LOG_LEVEL,
         "--no-skip-empty",
         "--bad-word", "facebook",
         "--force-cleanup",
-        "--output-directory", actions.utils.RUN_DIRECTORY
+        "--output-directory", geneva.actions.utils.RUN_DIRECTORY
     ]
     try:
         evolve.driver(cmd)
@@ -393,7 +393,7 @@ def test_driver_failure_cases(logger):
         "--test-type", "http",
         "--no-eval",
         "--eval-only", "\/",
-        "--log", actions.utils.CONSOLE_LOG_LEVEL,
+        "--log", geneva.actions.utils.CONSOLE_LOG_LEVEL,
         "--no-skip-empty",
     ]
     assert not evolve.driver(cmd)
@@ -405,10 +405,10 @@ def test_driver_failure_cases(logger):
         "--generations", "1",
         "--test-type", "http",
         "--seed", "<thiswillnotparse>",
-        "--log", actions.utils.CONSOLE_LOG_LEVEL,
+        "--log", geneva.actions.utils.CONSOLE_LOG_LEVEL,
         "--no-skip-empty",
     ]
-    with pytest.raises(actions.tree.ActionTreeParseError):
+    with pytest.raises(geneva.actions.tree.ActionTreeParseError):
         evolve.driver(cmd)
 
     print("testing with nonexistent field")
@@ -418,7 +418,7 @@ def test_driver_failure_cases(logger):
         "--generations", "1",
         "--test-type", "http",
         "--seed", "[TCP:thisdontexist:1]-drop-|",
-        "--log", actions.utils.CONSOLE_LOG_LEVEL,
+        "--log", geneva.actions.utils.CONSOLE_LOG_LEVEL,
         "--no-skip-empty",
     ]
     with pytest.raises(AssertionError):

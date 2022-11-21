@@ -7,10 +7,10 @@ sys.path.append("..")
 
 import evolve
 import evaluator
-import actions.strategy
+import geneva.actions.strategy
 import layers.packet
-import actions.utils
-import actions.tamper
+import geneva.actions.utils
+import geneva.actions.tamper
 import layers.layer
 import layers.ip_layer
 
@@ -23,7 +23,7 @@ def test_tamper(logger):
     """
     packet = layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1")/TCP(sport=2222, dport=3333, seq=100, ack=100, flags="S"))
     original = copy.deepcopy(packet)
-    tamper = actions.tamper.TamperAction(None, field="flags", tamper_type="replace", tamper_value="R")
+    tamper = geneva.actions.tamper.TamperAction(None, field="flags", tamper_type="replace", tamper_value="R")
     lpacket, rpacket = tamper.run(packet, logger)
     assert not rpacket, "Tamper must not return right child"
     assert lpacket, "Tamper must give a left child"
@@ -51,7 +51,7 @@ def test_tamper_ip(logger):
     """
     packet = layers.packet.Packet(IP(src='127.0.0.1', dst='127.0.0.1')/TCP(sport=2222, dport=3333, seq=100, ack=100, flags="S"))
     original = copy.deepcopy(packet)
-    tamper = actions.tamper.TamperAction(None, field="src", tamper_type="replace", tamper_value="192.168.1.1", tamper_proto="IP")
+    tamper = geneva.actions.tamper.TamperAction(None, field="src", tamper_type="replace", tamper_value="192.168.1.1", tamper_proto="IP")
     lpacket, rpacket = tamper.run(packet, logger)
     assert not rpacket, "Tamper must not return right child"
     assert lpacket, "Tamper must give a left child"
@@ -73,7 +73,7 @@ def test_tamper_udp(logger):
     """
     packet = layers.packet.Packet(IP(src='127.0.0.1', dst='127.0.0.1')/UDP(sport=2222, dport=53))
     original = copy.deepcopy(packet)
-    tamper = actions.tamper.TamperAction(None, field="chksum", tamper_type="replace", tamper_value=4444, tamper_proto="UDP")
+    tamper = geneva.actions.tamper.TamperAction(None, field="chksum", tamper_type="replace", tamper_value=4444, tamper_proto="UDP")
     lpacket, rpacket = tamper.run(packet, logger)
     assert not rpacket, "Tamper must not return right child"
     assert lpacket, "Tamper must give a left child"
@@ -96,7 +96,7 @@ def test_tamper_ip_ident(logger):
 
     packet = layers.packet.Packet(IP(src='127.0.0.1', dst='127.0.0.1')/TCP(sport=2222, dport=3333, seq=100, ack=100, flags="S"))
     original = copy.deepcopy(packet)
-    tamper = actions.tamper.TamperAction(None, field='id', tamper_type='replace', tamper_value=3333, tamper_proto="IP")
+    tamper = geneva.actions.tamper.TamperAction(None, field='id', tamper_type='replace', tamper_value=3333, tamper_proto="IP")
     lpacket, rpacket = tamper.run(packet, logger)
     assert not rpacket, "Tamper must not return right child"
     assert lpacket, "Tamper must give a left child"
@@ -140,22 +140,22 @@ def test_mutate(logger, use_canary):
         cmd = [
             "--test-type", "echo",
             "--censor", "censor2",
-            "--log", actions.utils.CONSOLE_LOG_LEVEL,
+            "--log", geneva.actions.utils.CONSOLE_LOG_LEVEL,
             "--no-skip-empty",
             "--bad-word", "facebook",
-            "--output-directory", actions.utils.RUN_DIRECTORY
+            "--output-directory", geneva.actions.utils.RUN_DIRECTORY
         ]
         tester = evaluator.Evaluator(cmd, logger)
 
         canary_id = evolve.run_collection_phase(logger, tester)
 
     for _ in range(0, 25):
-        tamper = actions.tamper.TamperAction(None, field="flags", tamper_type="replace", tamper_value="R", tamper_proto="TCP")
+        tamper = geneva.actions.tamper.TamperAction(None, field="flags", tamper_type="replace", tamper_value="R", tamper_proto="TCP")
 
         # Test mutation 200 times to ensure it remains stable
         for _ in range(0, 200):
             tamper._mutate(canary_id)
-            tamper2 = actions.tamper.TamperAction(None)
+            tamper2 = geneva.actions.tamper.TamperAction(None)
             # Confirm tamper value was properly ._fix()-ed
             val = tamper.tamper_value
             for _ in range(0, 5):
@@ -185,9 +185,9 @@ def test_parse_parameters(logger):
     Tests that tamper properly rejects malformed tamper actions
     """
     with pytest.raises(Exception):
-        actions.tamper.TamperAction().parse("this:has:too:many:parameters", logger)
+        geneva.actions.tamper.TamperAction().parse("this:has:too:many:parameters", logger)
     with pytest.raises(Exception):
-        actions.tamper.TamperAction().parse("not:enough", logger)
+        geneva.actions.tamper.TamperAction().parse("not:enough", logger)
 
 
 
@@ -195,7 +195,7 @@ def test_corrupt(logger):
     """
     Tests the tamper 'corrupt' primitive.
     """
-    tamper = actions.tamper.TamperAction(None, field="flags", tamper_type="corrupt", tamper_value="R")
+    tamper = geneva.actions.tamper.TamperAction(None, field="flags", tamper_type="corrupt", tamper_value="R")
     assert tamper.field == "flags", "Tamper action changed fields."
     assert tamper.tamper_type == "corrupt", "Tamper action changed types."
     assert str(tamper) == "tamper{TCP:flags:corrupt}", "Tamper returned incorrect string representation: %s" % str(tamper)
@@ -222,7 +222,7 @@ def test_add(logger):
     """
     Tests the tamper 'add' primitive.
     """
-    tamper = actions.tamper.TamperAction(None, field="seq", tamper_type="add", tamper_value=10)
+    tamper = geneva.actions.tamper.TamperAction(None, field="seq", tamper_type="add", tamper_value=10)
     assert tamper.field == "seq", "Tamper action changed fields."
     assert tamper.tamper_type == "add", "Tamper action changed types."
     assert str(tamper) == "tamper{TCP:seq:add:10}", "Tamper returned incorrect string representation: %s" % str(tamper)
@@ -250,7 +250,7 @@ def test_decompress(logger):
     """
     Tests the tamper 'decompress' primitive.
     """
-    tamper = actions.tamper.TamperAction(None, field="qd", tamper_type="compress", tamper_value=10, tamper_proto="DNS")
+    tamper = geneva.actions.tamper.TamperAction(None, field="qd", tamper_type="compress", tamper_value=10, tamper_proto="DNS")
     assert tamper.field == "qd", "Tamper action changed fields."
     assert tamper.tamper_type == "compress", "Tamper action changed types."
     assert str(tamper) == "tamper{DNS:qd:compress}", "Tamper returned incorrect string representation: %s" % str(tamper)
@@ -298,7 +298,7 @@ def test_corrupt_chksum(logger):
     """
     Tests the tamper 'replace' primitive.
     """
-    tamper = actions.tamper.TamperAction(None, field="chksum", tamper_type="corrupt", tamper_value="R")
+    tamper = geneva.actions.tamper.TamperAction(None, field="chksum", tamper_type="corrupt", tamper_value="R")
     assert tamper.field == "chksum", "Tamper action changed checksum."
     assert tamper.tamper_type == "corrupt", "Tamper action changed types."
     assert str(tamper) == "tamper{TCP:chksum:corrupt}", "Tamper returned incorrect string representation: %s" % str(tamper)
@@ -329,7 +329,7 @@ def test_corrupt_dataofs(logger):
     """
     packet = layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1")/TCP(sport=2222, dport=3333, seq=100, ack=100, flags="S", dataofs="6L"))
     original = copy.deepcopy(packet)
-    tamper = actions.tamper.TamperAction(None, field="dataofs", tamper_type="corrupt")
+    tamper = geneva.actions.tamper.TamperAction(None, field="dataofs", tamper_type="corrupt")
 
     tamper.tamper(packet, logger)
 
@@ -353,7 +353,7 @@ def test_replace(logger):
     """
     Tests the tamper 'replace' primitive.
     """
-    tamper = actions.tamper.TamperAction(None, field="flags", tamper_type="replace", tamper_value="R")
+    tamper = geneva.actions.tamper.TamperAction(None, field="flags", tamper_type="replace", tamper_value="R")
 
     assert tamper.field == "flags", "Tamper action changed fields."
     assert tamper.tamper_type == "replace", "Tamper action changed types."
@@ -386,7 +386,7 @@ def test_init():
     """
     Tests initializing with no parameters
     """
-    tamper = actions.tamper.TamperAction(None)
+    tamper = geneva.actions.tamper.TamperAction(None)
     assert tamper.field
     assert tamper.tamper_proto
     assert tamper.tamper_value is not None
@@ -396,7 +396,7 @@ def test_parse_flags(logger):
     """
     Tests the tamper 'replace' primitive.
     """
-    tamper = actions.tamper.TamperAction(None, field="flags", tamper_type="replace", tamper_value="FRAPUN")
+    tamper = geneva.actions.tamper.TamperAction(None, field="flags", tamper_type="replace", tamper_value="FRAPUN")
     assert tamper.field == "flags", "Tamper action changed checksum."
     assert tamper.tamper_type == "replace", "Tamper action changed types."
     assert str(tamper) == "tamper{TCP:flags:replace:FRAPUN}", "Tamper returned incorrect string representation: %s" % str(tamper)
@@ -413,9 +413,9 @@ def test_options(logger, value, test_type):
     Tests tampering options
     """
     if test_type == "direct":
-        tamper = actions.tamper.TamperAction(None, field="options-%s" % value.lower(), tamper_type="corrupt", tamper_value=bytes([12]))
+        tamper = geneva.actions.tamper.TamperAction(None, field="options-%s" % value.lower(), tamper_type="corrupt", tamper_value=bytes([12]))
     else:
-        tamper = actions.tamper.TamperAction(None)
+        tamper = geneva.actions.tamper.TamperAction(None)
         assert tamper.parse("TCP:options-%s:corrupt" % value.lower(), logger)
 
     packet = layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1")/TCP(sport=2222, dport=3333, seq=100, ack=100, flags="S"))
@@ -450,10 +450,10 @@ def test_tamper_mutate_compress(logger):
     """
     Tests that compress is handled right if its enabled
     """
-    backup = copy.deepcopy(actions.tamper.ACTIVATED_PRIMITIVES)
-    actions.tamper.ACTIVATED_PRIMITIVES = ["compress"]
+    backup = copy.deepcopy(geneva.actions.tamper.ACTIVATED_PRIMITIVES)
+    geneva.actions.tamper.ACTIVATED_PRIMITIVES = ["compress"]
     try:
-        tamper = actions.tamper.TamperAction(None)
+        tamper = geneva.actions.tamper.TamperAction(None)
         assert tamper.parse("TCP:flags:corrupt", logger)
         tamper._mutate_tamper_type()
         assert tamper.tamper_type == "compress"
@@ -463,4 +463,4 @@ def test_tamper_mutate_compress(logger):
         packet2 = tamper.tamper(packet, logger)
         assert packet2 == packet
     finally:
-        actions.tamper.ACTIVATED_PRIMITIVES = backup
+        geneva.actions.tamper.ACTIVATED_PRIMITIVES = backup

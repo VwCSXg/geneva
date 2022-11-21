@@ -4,10 +4,10 @@ import sys
 # Include the root of the project
 sys.path.append("..")
 
-import actions.fragment
+import geneva.actions.fragment
 import layers.packet
-import actions.strategy
-import actions.utils
+import geneva.actions.strategy
+import geneva.actions.utils
 import evolve
 
 from scapy.all import IP, TCP, UDP
@@ -19,7 +19,7 @@ def test_segment(logger):
     """
     Tests the duplicate action primitive.
     """
-    fragment = actions.fragment.FragmentAction(correct_order=True)
+    fragment = geneva.actions.fragment.FragmentAction(correct_order=True)
     assert str(fragment) == "fragment{tcp:-1:True}", "Fragment returned incorrect string representation: %s" % str(fragment)
 
     packet = layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1")/TCP()/("data"))
@@ -35,7 +35,7 @@ def test_segment_wrap(logger):
     """
     Tests if segment numbers can wrap around
     """
-    fragment = actions.fragment.FragmentAction(correct_order=True)
+    fragment = geneva.actions.fragment.FragmentAction(correct_order=True)
     assert str(fragment) == "fragment{tcp:-1:True}", "Fragment returned incorrect string representation: %s" % str(fragment)
 
     packet = layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1")/TCP()/("data"))
@@ -54,7 +54,7 @@ def test_segment_wrap2(logger):
     """
     Tests if segment numbers can wrap around testing for off-by-one
     """
-    fragment = actions.fragment.FragmentAction(correct_order=True)
+    fragment = geneva.actions.fragment.FragmentAction(correct_order=True)
     assert str(fragment) == "fragment{tcp:-1:True}", "Fragment returned incorrect string representation: %s" % str(fragment)
 
     packet = layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1")/TCP()/("data"))
@@ -74,7 +74,7 @@ def test_segment_wrap3(logger):
     """
     Tests if segment numbers can wrap around testing for off-by-one
     """
-    fragment = actions.fragment.FragmentAction(correct_order=True)
+    fragment = geneva.actions.fragment.FragmentAction(correct_order=True)
     assert str(fragment) == "fragment{tcp:-1:True}", "Fragment returned incorrect string representation: %s" % str(fragment)
 
     packet = layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1")/TCP()/("data"))
@@ -94,7 +94,7 @@ def test_segment_reverse(logger):
     """
     Tests the duplicate action primitive in reverse!
     """
-    fragment = actions.fragment.FragmentAction(correct_order=False)
+    fragment = geneva.actions.fragment.FragmentAction(correct_order=False)
     assert str(fragment) == "fragment{tcp:-1:False}", "Fragment returned incorrect string representation: %s" % str(fragment)
 
     packet = layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1")/TCP()/("data"))
@@ -111,7 +111,7 @@ def test_odd_fragment(logger):
     """
     Tests long IP fragmentation
     """
-    fragment = actions.fragment.FragmentAction(correct_order=True, segment=False)
+    fragment = geneva.actions.fragment.FragmentAction(correct_order=True, segment=False)
     assert str(fragment) == "fragment{ip:-1:True}", "Fragment returned incorrect string representation: %s" % str(fragment)
 
     packet = layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1", proto=0x06)/TCP(sport=2222, dport=3333, seq=100, ack=100, flags="S")/("dataisodd"))
@@ -129,7 +129,7 @@ def test_custom_fragment(logger):
     """
     Tests IP fragments with custom sized lengths
     """
-    fragment = actions.fragment.FragmentAction(correct_order=True, fragsize=3, segment=False)
+    fragment = geneva.actions.fragment.FragmentAction(correct_order=True, fragsize=3, segment=False)
     assert str(fragment) == "fragment{ip:3:True}", "Fragment returned incorrect string representation: %s" % str(fragment)
 
     packet = layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1", proto=0x06)/TCP(sport=2222, dport=3333, seq=100, ack=100, flags="S")/("thisissomedata"))
@@ -146,7 +146,7 @@ def test_reverse_fragment(logger):
     """
     Tests fragmentation with reversed packets
     """
-    fragment = actions.fragment.FragmentAction(correct_order=False, fragsize=3, segment=False)
+    fragment = geneva.actions.fragment.FragmentAction(correct_order=False, fragsize=3, segment=False)
     assert str(fragment) == "fragment{ip:3:False}", "Fragment returned incorrect string representation: %s" % str(fragment)
 
     packet = layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1", proto=0x06)/TCP(sport=2222, dport=3333, seq=100, ack=100, flags="S")/("thisissomedata"))
@@ -163,7 +163,7 @@ def test_udp_fragment(logger):
     """
     Tests fragmentation with reversed packets
     """
-    fragment = actions.fragment.FragmentAction(correct_order=False, fragsize=2, segment=False)
+    fragment = geneva.actions.fragment.FragmentAction(correct_order=False, fragsize=2, segment=False)
     assert str(fragment) == "fragment{ip:2:False}", "Fragment returned incorrect string representation: %s" % str(fragment)
 
     packet = layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1", proto=0x06)/UDP(sport=2222, dport=3333, chksum=0x4444)/("thisissomedata"))
@@ -177,7 +177,7 @@ def test_mutate(logger):
     """
     Tests mutating the fragment action
     """
-    fragment = actions.fragment.FragmentAction(correct_order=False, fragsize=2, segment=False)
+    fragment = geneva.actions.fragment.FragmentAction(correct_order=False, fragsize=2, segment=False)
     assert str(fragment) == "fragment{ip:2:False}", "Fragment returned incorrect string representation: %s" % str(fragment)
 
     for _ in range(0, 200):
@@ -191,7 +191,7 @@ def test_parse(logger):
     """
     Tests parsing.
     """
-    fragment = actions.fragment.FragmentAction(correct_order=False, fragsize=2, segment=False)
+    fragment = geneva.actions.fragment.FragmentAction(correct_order=False, fragsize=2, segment=False)
     assert str(fragment) == "fragment{ip:2:False}", "Fragment returned incorrect string representation: %s" % str(fragment)
 
     fragment.parse("fragment{tcp:5:False}", logger)
@@ -209,31 +209,31 @@ def test_parse(logger):
     assert fragment.fragsize == 5
     assert fragment.segment == True
 
-    fragment = actions.fragment.FragmentAction()
+    fragment = geneva.actions.fragment.FragmentAction()
     assert fragment.correct_order in [True, False]
     packet = layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1")/TCP(sport=2222, dport=3333, seq=100, ack=100, flags="S"))
 
-    strat = actions.utils.parse("[IP:proto:6:0]-tamper{IP:proto:replace:6}(fragment{ip:-1:True}(tamper{TCP:dataofs:replace:8}(duplicate,),tamper{IP:frag:replace:0}),)-| [IP:tos:0:0]-duplicate-| \/", logger)
+    strat = geneva.actions.utils.parse("[IP:proto:6:0]-tamper{IP:proto:replace:6}(fragment{ip:-1:True}(tamper{TCP:dataofs:replace:8}(duplicate,),tamper{IP:frag:replace:0}),)-| [IP:tos:0:0]-duplicate-| \/", logger)
     strat.act_on_packet(packet, logger)
 
     packet = layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1")/UDP(sport=2222, dport=3333, chksum=0x4444))
-    strat = actions.utils.parse("[IP:proto:6:0]-tamper{IP:proto:replace:6}(fragment{ip:-1:True}(tamper{TCP:dataofs:replace:8}(duplicate,),tamper{IP:frag:replace:0}),)-| [IP:tos:0:0]-duplicate-| \/", logger)
+    strat = geneva.actions.utils.parse("[IP:proto:6:0]-tamper{IP:proto:replace:6}(fragment{ip:-1:True}(tamper{TCP:dataofs:replace:8}(duplicate,),tamper{IP:frag:replace:0}),)-| [IP:tos:0:0]-duplicate-| \/", logger)
     strat.act_on_packet(packet, logger)
 
     packet = layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1")/TCP(sport=2222, dport=3333, chksum=0x4444))
-    strat = actions.utils.parse("[TCP:urgptr:0]-tamper{TCP:options-altchksumopt:corrupt}(fragment{tcp:-1:True}(tamper{IP:proto:corrupt},tamper{TCP:seq:replace:654077552}),)-| \/", logger)
+    strat = geneva.actions.utils.parse("[TCP:urgptr:0]-tamper{TCP:options-altchksumopt:corrupt}(fragment{tcp:-1:True}(tamper{IP:proto:corrupt},tamper{TCP:seq:replace:654077552}),)-| \/", logger)
     strat.act_on_packet(packet, logger)
 
-    strat = actions.utils.parse("[TCP:options-mss:]-tamper{TCP:load:replace:}(fragment{tcp:-1:True},)-| \/", logger)
+    strat = geneva.actions.utils.parse("[TCP:options-mss:]-tamper{TCP:load:replace:}(fragment{tcp:-1:True},)-| \/", logger)
     strat.act_on_packet(packet, logger)
 
-    strat = actions.utils.parse("[TCP:options-mss:]-tamper{IP:frag:replace:1353}(tamper{TCP:load:replace:}(fragment{tcp:-1:True},),)-| \/", logger)
+    strat = geneva.actions.utils.parse("[TCP:options-mss:]-tamper{IP:frag:replace:1353}(tamper{TCP:load:replace:}(fragment{tcp:-1:True},),)-| \/", logger)
     strat.act_on_packet(packet, logger)
 
-    strat = actions.utils.parse("[IP:ihl:5]-duplicate-| [TCP:options-mss:]-tamper{IP:frag:replace:1353}(fragment{tcp:-1:True}(tamper{TCP:load:replace:}(fragment{tcp:-1:False},),tamper{DNSQR:qtype:replace:45416}),)-| \/", logger)
+    strat = geneva.actions.utils.parse("[IP:ihl:5]-duplicate-| [TCP:options-mss:]-tamper{IP:frag:replace:1353}(fragment{tcp:-1:True}(tamper{TCP:load:replace:}(fragment{tcp:-1:False},),tamper{DNSQR:qtype:replace:45416}),)-| \/", logger)
     strat.act_on_packet(packet, logger)
 
-    strat = actions.utils.parse("[DNSQR:qclass:25989]-duplicate(duplicate(tamper{DNSQR:qtype:replace:30882},),tamper{UDP:sport:replace:42042})-| [TCP:options-nop:]-tamper{TCP:options-nop:corrupt}(tamper{TCP:load:replace:mjkuskjzgy}(tamper{IP:frag:replace:410}(fragment{tcp:-1:True},),),)-| \/", logger)
+    strat = geneva.actions.utils.parse("[DNSQR:qclass:25989]-duplicate(duplicate(tamper{DNSQR:qtype:replace:30882},),tamper{UDP:sport:replace:42042})-| [TCP:options-nop:]-tamper{TCP:options-nop:corrupt}(tamper{TCP:load:replace:mjkuskjzgy}(tamper{IP:frag:replace:410}(fragment{tcp:-1:True},),),)-| \/", logger)
     strat.act_on_packet(packet, logger)
 
 
@@ -241,7 +241,7 @@ def test_fallback(logger):
     """
     Tests fallback behavior.
     """
-    fragment = actions.fragment.FragmentAction(correct_order=False, fragsize=2, segment=False)
+    fragment = geneva.actions.fragment.FragmentAction(correct_order=False, fragsize=2, segment=False)
     assert str(fragment) == "fragment{ip:2:False}", "Fragment returned incorrect string representation: %s" % str(fragment)
 
     fragment.parse("fragment{ip:0:False}", logger)
@@ -273,7 +273,7 @@ def test_ip_only_fragment(logger):
     """
     Tests fragmentation without higher protocols.
     """
-    fragment = actions.fragment.FragmentAction(correct_order=True)
+    fragment = geneva.actions.fragment.FragmentAction(correct_order=True)
     fragment.parse("fragment{ip:-1:True}", logger)
 
     packet = layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1")/("datadata11datadata"))
@@ -290,7 +290,7 @@ def test_overlapping_segment():
     """
     Basic test for overlapping segments.
     """
-    fragment = actions.fragment.FragmentAction(correct_order=True)
+    fragment = geneva.actions.fragment.FragmentAction(correct_order=True)
     fragment.parse("fragment{tcp:-1:True:4}", logger)
 
     packet = layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1")/TCP(seq=100)/("datadata11datadata"))
@@ -309,7 +309,7 @@ def test_overlapping_segment_no_overlap():
     """
     Basic test for overlapping segments with no overlap. (shouldn't ever actually happen)
     """
-    fragment = actions.fragment.FragmentAction(correct_order=True)
+    fragment = geneva.actions.fragment.FragmentAction(correct_order=True)
     fragment.parse("fragment{tcp:-1:True:0}", logger)
 
     packet = layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1")/TCP(seq=100)/("datadata11datadata"))
@@ -328,7 +328,7 @@ def test_overlapping_segment_entire_packet():
     """
     Basic test for overlapping segments overlapping entire packet.
     """
-    fragment = actions.fragment.FragmentAction(correct_order=True)
+    fragment = geneva.actions.fragment.FragmentAction(correct_order=True)
     fragment.parse("fragment{tcp:-1:True:9}", logger)
 
     packet = layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1")/TCP(seq=100)/("datadata11datadata"))
@@ -347,7 +347,7 @@ def test_overlapping_segment_out_of_bounds():
     """
     Basic test for overlapping segments overlapping beyond the edge of the packet.
     """
-    fragment = actions.fragment.FragmentAction(correct_order=True)
+    fragment = geneva.actions.fragment.FragmentAction(correct_order=True)
     fragment.parse("fragment{tcp:-1:True:20}", logger)
 
     packet = layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1")/TCP(seq=100)/("datadata11datadata"))
@@ -367,5 +367,5 @@ def test_overlapping_segmentation_parse():
     Basic test for parsing overlapping segments.
     """
 
-    fragment = actions.fragment.FragmentAction(correct_order=False, fragsize=2, segment=True, overlap=3)
+    fragment = geneva.actions.fragment.FragmentAction(correct_order=False, fragsize=2, segment=True, overlap=3)
     assert str(fragment) == "fragment{tcp:2:False:3}", "Fragment returned incorrect string representation: %s" % str(fragment)

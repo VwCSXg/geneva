@@ -22,7 +22,7 @@ import urllib.request
 import requests
 from scapy.all import *
 
-import actions.utils
+import geneva.actions.utils
 from plugins.plugin import Plugin
 
 import layers.packet
@@ -120,7 +120,7 @@ class AmplificationPluginRunner(Plugin):
         # Maps source ports to strategies
         self.strategy_ports = {}
         self.sent_sizes = {}
-        for ind in tqdm.tqdm(population, leave=False, disable=(actions.utils.CONSOLE_LOG_LEVEL == "debug")):
+        for ind in tqdm.tqdm(population, leave=False, disable=(geneva.actions.utils.CONSOLE_LOG_LEVEL == "debug")):
             sport = get_open_sport(self.strategy_ports, logger)
             # Reserve this source port for this strategy
             self.strategy_ports[sport] = ind
@@ -184,7 +184,7 @@ class AmplificationPluginRunner(Plugin):
                     ind.fitness = round(ind.fitness / self.sent_sizes[port], 3)
                     self.logger.debug("[%s] Fitness %s: %s" % (ind.environment_id, ind.fitness, str(ind)))
 
-                ind.fitness = actions.utils.punish_unused(ind.fitness, logger, ind)
+                ind.fitness = geneva.actions.utils.punish_unused(ind.fitness, logger, ind)
             logger.debug("[%s] Fitness: %s: %s" % (ind.environment_id, ind.fitness, str(ind)))
 
         self.strategy_ports.clear()

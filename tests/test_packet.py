@@ -1,7 +1,7 @@
 import pytest
 
-import actions.utils
-import actions.trigger
+import geneva.actions.utils
+import geneva.actions.trigger
 import layers.packet
 import layers.layer
 import layers.tcp_layer
@@ -107,7 +107,7 @@ def test_parse_load(logger):
     pkt = layers.packet.Packet(IP()/TCP()/"TYPE A\r\n")
     print("Parsed: %s" % pkt.get("TCP", "load"))
 
-    strat = actions.utils.parse("[TCP:load:TYPE%20A%0D%0A]-drop-| \/", logger)
+    strat = geneva.actions.utils.parse("[TCP:load:TYPE%20A%0D%0A]-drop-| \/", logger)
     results = strat.act_on_packet(pkt, logger)
     assert not results
 
@@ -498,7 +498,7 @@ def test_restrict_fields(logger):
         assert layer == TCP
         assert field == "flags"
 
-        _, proto, field, value, _ = actions.trigger.Trigger.get_rand_trigger(None, 0)
+        _, proto, field, value, _ = geneva.actions.trigger.Trigger.get_rand_trigger(None, 0)
         assert proto == 'TCP'
         assert field == "flags"
     layers.packet.Packet.reset_restrictions()
@@ -544,7 +544,7 @@ def test_restrict_fields(logger):
         assert layer in [TCP, IP]
         assert field not in ["sport", "dport", "seq", "src"]
 
-        _, proto, field, value, _ = actions.trigger.Trigger.get_rand_trigger(None, 0)
+        _, proto, field, value, _ = geneva.actions.trigger.Trigger.get_rand_trigger(None, 0)
         assert proto in ['TCP', 'IP']
         assert field not in ["sport", "dport", "seq", "src"]
 

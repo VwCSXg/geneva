@@ -21,7 +21,7 @@ import requests
 
 socket.setdefaulttimeout(1)
 
-import actions.utils
+import geneva.actions.utils
 
 from plugins.plugin import Plugin
 
@@ -67,15 +67,15 @@ class ESNIPluginRunner(Plugin):
         if evaluator.args["server_side"]:
             ind.fitness = server.punish_fitness(ind.fitness, logger)
             output_path = os.path.join(PROJECT_ROOT, evaluator.client_args.get("output_directory"))
-            fitpath = os.path.join(PROJECT_ROOT, output_path, actions.utils.FLAGFOLDER, environment["id"]) + ".fitness"
+            fitpath = os.path.join(PROJECT_ROOT, output_path, geneva.actions.utils.FLAGFOLDER, environment["id"]) + ".fitness"
             with open(fitpath, "w") as fitfile:
                 fitfile.write(str(ind.fitness))
 
         if evaluator.server_cls and not evaluator.args["external_server"]:
             logger.debug("CHECKING FOR SERVER TIMEOUT")
             output_path = os.path.join(PROJECT_ROOT, evaluator.client_args.get("output_directory"))
-            timeout_flag = os.path.join(output_path, actions.utils.FLAGFOLDER, environment["id"]) + ".timeout"
-            fitpath = os.path.join(PROJECT_ROOT, output_path, actions.utils.FLAGFOLDER, environment["id"]) + ".fitness"
+            timeout_flag = os.path.join(output_path, geneva.actions.utils.FLAGFOLDER, environment["id"]) + ".timeout"
+            fitpath = os.path.join(PROJECT_ROOT, output_path, geneva.actions.utils.FLAGFOLDER, environment["id"]) + ".fitness"
             if os.path.exists(timeout_flag):
                 logger.debug("Server timeout detected")
                 ind.fitness = -360

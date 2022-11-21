@@ -3,7 +3,7 @@ import pytest
 sys.path.append("..") # Include the root of the project
 import evolve
 import os
-import actions.utils
+import geneva.actions.utils
 import layers.layer
 
 # Test Files Directory Setup
@@ -76,7 +76,7 @@ def test_save_and_load_generation(logger):
             p = evolve.generate_strategy(logger, options["in-trees"], options["out-trees"], options["in-actions"],
                                          options["out-actions"],
                                          options["seed"], environment_id=None)
-            actions.utils.parse(str(p), logger)
+            geneva.actions.utils.parse(str(p), logger)
             population.append(p)
             if i == options["population_size"] - 1:
                 population_str += str(p)
@@ -119,7 +119,7 @@ def test_evolve_load_generation(logger):
                                          options["out-actions"],
                                          options["seed"], environment_id=None)
             print(str(p))
-            actions.utils.parse(str(p), logger)
+            geneva.actions.utils.parse(str(p), logger)
             population.append(p)
             if i == options["population_size"] - 1:
                 population_str += str(p)

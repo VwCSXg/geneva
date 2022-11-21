@@ -18,7 +18,7 @@ import warnings
 import requests
 import urllib3
 
-import actions.utils
+import geneva.actions.utils
 import censors.censor_driver
 
 
@@ -58,7 +58,7 @@ class Evaluator():
         if not self.external_server and self.external_client:
             assert self.args.get("public_ip", ""), "Cannot use an external client to this server without specifying the public IP."
             self.public_ip = self.args.get("public_ip", "")
-            worker = actions.utils.get_worker(self.public_ip, logger)
+            worker = geneva.actions.utils.get_worker(self.public_ip, logger)
             if worker:
                 self.public_ip = worker["ip"]
             self.args.update({'server': self.public_ip})
@@ -77,7 +77,7 @@ class Evaluator():
 
         # Plugin may optionally override the strategy evaluation for a single individual or the entire evaluation
         try:
-            _, plugin_cls = actions.utils.import_plugin(self.test_plugin, "plugin")
+            _, plugin_cls = geneva.actions.utils.import_plugin(self.test_plugin, "plugin")
             parsed_args = plugin_cls.get_args(command)
             self.args.update({k:v for k,v in parsed_args.items() if v or (not v and k not in self.args)})
             self.plugin = plugin_cls(self.args)
@@ -195,7 +195,7 @@ class Evaluator():
 
         Args:
             environment (dict): Dictionary of environment variables
-            ind (:obj:`actions.strategy.Strategy`): A strategy object to test with
+            ind (:obj:`geneva.actions.strategy.Strategy`): A strategy object to test with
 
         Returns:
             tuple: (ind.environment_id, ind.fitness) environment ID of strategy and fitness
@@ -254,8 +254,8 @@ class Evaluator():
                     # If the engine ran on the server side, ask that it punish fitness
                     if self.args["server_side"]:
                         ind.fitness = server.punish_fitness(ind.fitness, self.logger)
-                        actions.utils.write_fitness(ind.fitness, self.output_directory, environment["id"])
-            except actions.utils.SkipStrategyException as exc:
+                        geneva.actions.utils.write_fitness(ind.fitness, self.output_directory, environment["id"])
+            except geneva.actions.utils.SkipStrategyException as exc:
                 self.logger.debug("Strategy evaluation ending.")
                 ind.fitness = exc.fitness
                 fitnesses.append(ind.fitness)
@@ -273,7 +273,7 @@ class Evaluator():
             ind.fitness = max(fitnesses)
         elif self.fitness_by == "avg":
             ind.fitness = round(sum(fitnesses)/len(fitnesses), 2)
-        actions.utils.write_fitness(ind.fitness, self.output_directory, environment["id"])
+        geneva.actions.utils.write_fitness(ind.fitness, self.output_directory, environment["id"])
 
         # Log the fitness
         self.logger.info("[%s] Fitness %s: %s" % (ind.environment_id, str(ind.fitness), str(ind)))
@@ -300,10 +300,10 @@ class Evaluator():
         else:
             self.run_local_client(args, environment, logger)
 
-        fitpath = os.path.join(BASEPATH, self.output_directory, actions.utils.FLAGFOLDER, environment["id"]) + ".fitness"
+        fitpath = os.path.join(BASEPATH, self.output_directory, geneva.actions.utils.FLAGFOLDER, environment["id"]) + ".fitness"
         # Do not overwrite the fitness if it already exists
         if not os.path.exists(fitpath):
-            actions.utils.write_fitness(fitness, self.output_directory, environment["id"])
+            geneva.actions.utils.write_fitness(fitness, self.output_directory, environment["id"])
         return fitness
 
     def run_docker_client(self, args, environment, logger):
@@ -317,7 +317,7 @@ class Evaluator():
             logger (:obj:`logging.Logger`): A logger to log with
         """
         command = ["docker", "exec", "--privileged", environment["client"]["container"].name, "python", "code/plugins/plugin_client.py", "--server", environment["server"]["ip"]]
-        base_cmd = actions.utils.build_command(args)
+        base_cmd = geneva.actions.utils.build_command(args)
         command += base_cmd
         self.exec_cmd(command)
 
@@ -359,7 +359,7 @@ class Evaluator():
         if worker["username"] != "root":
             command = ["sudo"]
         command += [worker["python"], os.path.join(worker["geneva_path"], "plugins/plugin_client.py")]
-        base_cmd = actions.utils.build_command(args)
+        base_cmd = geneva.actions.utils.build_command(args)
         command += base_cmd
         command = " ".join(command)
 
@@ -371,7 +371,7 @@ class Evaluator():
             self.get_log(remote, worker, "%s.engine.log" % environment["id"], logger)
 
         # Get the individual's fitness
-        command = 'cat %s/%s/%s/%s.fitness' % (worker["geneva_path"], self.output_directory, actions.utils.FLAGFOLDER, environment["id"])
+        command = 'cat %s/%s/%s/%s.fitness' % (worker["geneva_path"], self.output_directory, geneva.actions.utils.FLAGFOLDER, environment["id"])
         remote_fitness, error_lines = self.remote_exec_cmd(remote, command, logger)
         fitness = -1000
         try:
@@ -473,7 +473,7 @@ class Evaluator():
         """
         # Launch the plugin client
         command = [sys.executable, "plugins/plugin_client.py", "--plugin", self.client_cls.name]
-        base_cmd = actions.utils.build_command(args)
+        base_cmd = geneva.actions.utils.build_command(args)
         command += base_cmd
         # Replace strings of empty strings "''" with empty strings "", as subprocess will handle this correctly
         command = [x if x != "''" else "" for x in command]
@@ -490,7 +490,7 @@ class Evaluator():
         """
         self.logger.debug(" ".join(command))
         try:
-            if actions.utils.get_console_log_level() == "debug":
+            if geneva.actions.utils.get_console_log_level() == "debug":
                 subprocess.check_call(command, timeout=60)
             else:
                 subprocess.check_call(command, stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL, timeout=60)
@@ -516,7 +516,7 @@ class Evaluator():
         output = ""
         try:
             output = subprocess.check_output(command, timeout=60, stderr=subprocess.PIPE).decode('utf-8', 'ignore')
-            if actions.utils.get_console_log_level() == "debug":
+            if geneva.actions.utils.get_console_log_level() == "debug":
                 self.logger.debug(output)
         except subprocess.CalledProcessError as exc:
             # Code 137 is for SIGKILL, which is how docker containers are shutdown by the evaluator.
@@ -554,7 +554,7 @@ class Evaluator():
             logger (:obj:`logging.Logger`): A logger to log with
         """
         command = ["docker", "exec", "--privileged", environment["server"]["container"].name, "python", "code/plugins/plugin_server.py", "--test-type", self.server_cls.name]
-        base_cmd = actions.utils.build_command(args)
+        base_cmd = geneva.actions.utils.build_command(args)
         command += base_cmd
         # Replace strings of empty strings "''" with empty strings "", as subprocess will handle this correctly
         command = [x if x != "''" else "" for x in command]
@@ -603,7 +603,7 @@ class Evaluator():
             # Shut down the server
             server.stop()
             # Shut down the server's logger, now that we are done with it
-            actions.utils.close_logger(environment["server_logger"])
+            geneva.actions.utils.close_logger(environment["server_logger"])
 
     def run_local_server(self, args, environment, logger):
         """
@@ -616,7 +616,7 @@ class Evaluator():
         """
         server = self.server_cls(args)
         logger.debug("Starting local server with args: %s" % str(args))
-        server_logger = actions.utils.get_logger(PROJECT_ROOT, args["output_directory"], "server", "server", environment["id"], log_level=actions.utils.get_console_log_level())
+        server_logger = geneva.actions.utils.get_logger(PROJECT_ROOT, args["output_directory"], "server", "server", environment["id"], log_level=geneva.actions.utils.get_console_log_level())
         environment["server_logger"] = server_logger
         args.update({"test_type": self.server_cls.name})
         if not args.get("server_side"):
@@ -629,7 +629,7 @@ class Evaluator():
         Learning phase runs the client against the censor to collect packets.
 
         Args:
-            canary (:obj:`actions.strategy.Strategy`): A (usually empty) strategy object to evaluate
+            canary (:obj:`geneva.actions.strategy.Strategy`): A (usually empty) strategy object to evaluate
 
         Returns:
             str: canary id used ("canary")
@@ -756,7 +756,7 @@ class Evaluator():
         import paramiko
         paramiko_logger = paramiko.util.logging.getLogger()
         paramiko_logger.setLevel(logging.WARN)
-        worker = actions.utils.get_worker(self.external_client, self.logger)
+        worker = geneva.actions.utils.get_worker(self.external_client, self.logger)
 
         if self.use_docker:
             worker["ip"] = "0.0.0.0"
@@ -798,7 +798,7 @@ class Evaluator():
 
         if self.external_client:
             environment["remote"] = self.setup_remote()
-            environment["worker"] = actions.utils.get_worker(self.external_client, self.logger)
+            environment["worker"] = geneva.actions.utils.get_worker(self.external_client, self.logger)
 
         for ind in ind_list:
             if self.stop:
@@ -827,7 +827,7 @@ class Evaluator():
             ind_list (list): List of individuals to assign random IDs to
         """
         for ind in ind_list:
-            ind.environment_id = actions.utils.get_id()
+            ind.environment_id = geneva.actions.utils.get_id()
             ind.fitness = None
 
     def dump_logs(self, environment_id):
@@ -1008,9 +1008,9 @@ class Evaluator():
         Looks for this individual's fitness file on disk, opens it, and stores the fitness in the given individual.
 
         Args:
-            ind (:obj:`actions.strategy.Strategy`): Individual to read fitness for
+            ind (:obj:`geneva.actions.strategy.Strategy`): Individual to read fitness for
         """
-        fitness_path = os.path.join(BASEPATH, self.output_directory, actions.utils.FLAGFOLDER, ind.environment_id + ".fitness")
+        fitness_path = os.path.join(BASEPATH, self.output_directory, geneva.actions.utils.FLAGFOLDER, ind.environment_id + ".fitness")
         try:
             if os.path.exists(fitness_path):
                 with open(fitness_path, "r") as fd:
@@ -1072,7 +1072,7 @@ def collect_plugin(test_plugin, plugin_type, command, full_args, plugin_args):
     """
     cls = None
     try:
-        _, cls = actions.utils.import_plugin(test_plugin, plugin_type)
+        _, cls = geneva.actions.utils.import_plugin(test_plugin, plugin_type)
         parsed_args = cls.get_args(command)
         # Only override the args if the plugin successfully parsed something; this allows
         # defaults from the evaluator or plugin to propagate.
@@ -1114,7 +1114,7 @@ def get_arg_parser(single_use=False):
     # Disable prefix matching to avoid prefix collisions for unseen plugin arguments
     parser = argparse.ArgumentParser(description='Evaluate a given strategy a given number of times.', allow_abbrev=False, prog="evaluator.py")
     # Type of evaluation
-    parser.add_argument('--test-type', action='store', choices=actions.utils.get_plugins(), default="http", help="plugin to launch")
+    parser.add_argument('--test-type', action='store', choices=geneva.actions.utils.get_plugins(), default="http", help="plugin to launch")
     parser.add_argument('--strategy', action='store', default="", required=single_use, help='strategy to evaluate')
 
     logging_group = parser.add_argument_group('control aspects of evaluator logging and storage')

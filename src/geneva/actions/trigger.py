@@ -1,4 +1,4 @@
-import actions.utils
+import geneva.actions.utils
 import random
 import re
 import layers.packet
@@ -58,7 +58,7 @@ class Trigger(object):
         """
         Creates a random trigger.
         """
-        proto, field, value = actions.utils.get_from_fuzzed_or_real_packet(environment_id, real_packet_probability, enable_options=False, enable_load=False)
+        proto, field, value = geneva.actions.utils.get_from_fuzzed_or_real_packet(environment_id, real_packet_probability, enable_options=False, enable_load=False)
         gas_remaining = Trigger.get_gas()
         if not FIXED_TRIGGER:
             # Only "field" triggers are supported currently

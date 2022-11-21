@@ -7,9 +7,6 @@ import importlib
 import os
 import sys
 
-import actions.utils
-
-
 ACTION_CACHE = {}
 ACTION_CACHE["in"] = {}
 ACTION_CACHE["out"] = {}
@@ -117,12 +114,12 @@ class Action():
             importlib.import_module("actions." + action)
             def check_action(obj):
                 return inspect.isclass(obj) and \
-                        issubclass(obj, actions.action.Action) and \
-                        obj != actions.action.Action and \
-                        obj().applies(direction) and \
-                        obj().enabled and \
-                        not any([x in str(obj) for x in disabled]) and \
-                        (allow_terminal or not obj().terminal)
+                       issubclass(obj, genva.actions.action.Action) and \
+                       obj != genva.actions.action.Action and \
+                       obj().applies(direction) and \
+                       obj().enabled and \
+                       not any([x in str(obj) for x in disabled]) and \
+                       (allow_terminal or not obj().terminal)
             clsmembers = inspect.getmembers(sys.modules["actions."+action], predicate=check_action)
             collected_actions += clsmembers
 

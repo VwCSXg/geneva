@@ -3,8 +3,8 @@ import sys
 # Include the root of the project
 sys.path.append("..")
 
-import actions.strategy
-import actions.utils
+import geneva.actions.strategy
+import geneva.actions.utils
 import evolve
 import evaluator
 
@@ -24,7 +24,7 @@ def run_test(logger, solution, censor, test_type, log_on_success=False, log_on_f
 
     try:
         # Parse the string representation of the solution
-        strat = actions.utils.parse(solution, logger)
+        strat = geneva.actions.utils.parse(solution, logger)
         logger.info("Parsed strategy %s" % (str(strat)))
 
         # Confirm the parsing was correct
@@ -42,10 +42,10 @@ def run_test(logger, solution, censor, test_type, log_on_success=False, log_on_f
         cmd = [
             "--test-type", "echo",
             "--censor", censor,
-            "--log", actions.utils.CONSOLE_LOG_LEVEL,
+            "--log", geneva.actions.utils.CONSOLE_LOG_LEVEL,
             "--no-skip-empty",
             "--bad-word", "facebook",
-            "--output-directory", actions.utils.RUN_DIRECTORY
+            "--output-directory", geneva.actions.utils.RUN_DIRECTORY
         ]
         if log_on_success:
             cmd += ["--log-on-success"]

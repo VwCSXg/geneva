@@ -9,7 +9,7 @@ import os
 import socket
 
 from plugins.plugin_server import ServerPlugin
-import actions.utils
+import geneva.actions.utils
 
 
 BASEPATH = os.path.dirname(os.path.abspath(__file__))
@@ -85,13 +85,13 @@ class ESNIServer(ServerPlugin):
         except socket.timeout as e:
             # write to a flag file to pass back to the plugin that this strategy failed
             logger.debug("Server: Connection timed out")
-            flagpath = os.path.join(PROJECT_ROOT, args["output_directory"], actions.utils.FLAGFOLDER, args["environment_id"]) + ".timeout"
+            flagpath = os.path.join(PROJECT_ROOT, args["output_directory"], geneva.actions.utils.FLAGFOLDER, args["environment_id"]) + ".timeout"
             with open(flagpath, "w") as fd:
                 fd.write("timeout caught")
                 fd.flush()
         except AssertionError as exc:
             logger.debug("Did not receive all data: probably a client timeout")
-            flagpath = os.path.join(PROJECT_ROOT, args["output_directory"], actions.utils.FLAGFOLDER, args["environment_id"]) + ".timeout"
+            flagpath = os.path.join(PROJECT_ROOT, args["output_directory"], geneva.actions.utils.FLAGFOLDER, args["environment_id"]) + ".timeout"
             with open(flagpath, "w") as fd:
                 fd.write("timeout caught")
                 fd.flush()
@@ -102,7 +102,7 @@ class ESNIServer(ServerPlugin):
                 logger.debug("Server: Client quit.")
         except AssertionError:
             logger.debug("Server: Got incorrect data. Client's packets getting dropped?")
-            flagpath = os.path.join(PROJECT_ROOT, args["output_directory"], actions.utils.FLAGFOLDER, args["environment_id"]) + ".timeout"
+            flagpath = os.path.join(PROJECT_ROOT, args["output_directory"], geneva.actions.utils.FLAGFOLDER, args["environment_id"]) + ".timeout"
             with open(flagpath, "w") as fd:
                 fd.write("packets dropped")
                 fd.flush()

@@ -9,7 +9,7 @@ BASEPATH = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(BASEPATH)
 sys.path.append(PROJECT_ROOT)
 
-import actions.sniffer
+import geneva.actions.sniffer
 import engine
 
 from plugins.plugin import Plugin
@@ -29,7 +29,7 @@ class ClientPlugin(Plugin):
         """
         # Do not add a help message; this allows us to collect the arguments from server plugins
         parser = argparse.ArgumentParser(description='Client plugin runner', allow_abbrev=False, add_help=False)
-        parser.add_argument('--test-type', action='store', choices=actions.utils.get_plugins(), default="http", help="plugin to launch")
+        parser.add_argument('--test-type', action='store', choices=geneva.actions.utils.get_plugins(), default="http", help="plugin to launch")
         parser.add_argument('--environment-id', action='store', help="ID of the current environment")
         parser.add_argument('--output-directory', action='store', help="Where to output results")
         parser.add_argument('--no-engine', action="store_true",
@@ -66,7 +66,7 @@ class ClientPlugin(Plugin):
         pcap_filename = os.path.join(output_path, "packets", eid + "_client.pcap")
 
         # Start a sniffer to capture traffic that the plugin generates
-        with actions.sniffer.Sniffer(pcap_filename, port, logger) as sniff:
+        with geneva.actions.sniffer.Sniffer(pcap_filename, port, logger) as sniff:
 
             # Conditionally initialize the engine
             with engine.Engine(port, args.get("strategy"), server_side=False, environment_id=eid, output_directory=output_path, log_level=args.get("log", "info"), enabled=use_engine) as eng:
@@ -78,7 +78,7 @@ class ClientPlugin(Plugin):
                 fitness = self.run(args, logger, engine=eng)
                 logger.debug("Plugin client has finished.")
                 if use_engine:
-                    fitness = actions.utils.punish_fitness(fitness, logger, eng)
+                    fitness = geneva.actions.utils.punish_fitness(fitness, logger, eng)
 
         # If fitness files are disabled, just return
         if args.get("no_fitness_file"):
@@ -86,7 +86,7 @@ class ClientPlugin(Plugin):
 
         logger.debug("Fitness: %d", fitness)
 
-        actions.utils.write_fitness(fitness, output_path, eid)
+        geneva.actions.utils.write_fitness(fitness, output_path, eid)
         return fitness
 
     def wait_for_censor(self, serverip, port, environment_id, log_dir):
@@ -96,7 +96,7 @@ class ClientPlugin(Plugin):
         for _ in range(0, 200):
             check = IP(dst=serverip)/TCP(dport=int(port), sport=2222, seq=13337)/Raw(load="checking")
             send(check, verbose=False)
-            ready_path = os.path.join(BASEPATH, log_dir, actions.utils.FLAGFOLDER, "%s.censor_ready" % environment_id)
+            ready_path = os.path.join(BASEPATH, log_dir, geneva.actions.utils.FLAGFOLDER, "%s.censor_ready" % environment_id)
             if os.path.exists(ready_path):
                 os.system("rm %s" % ready_path)
                 break
@@ -114,7 +114,7 @@ def main(command):
     plugin = ClientPlugin.get_args(command)["test_type"]
 
     # Import that plugin
-    _, cls = actions.utils.import_plugin(plugin, "client")
+    _, cls = geneva.actions.utils.import_plugin(plugin, "client")
 
     # Ask the plugin to parse the args
     plugin_args = cls.get_args(command)
@@ -123,7 +123,7 @@ def main(command):
     client_plugin = cls(plugin_args)
 
     # Define a logger and launch the plugin
-    with actions.utils.Logger(plugin_args["output_directory"], __name__, "client", plugin_args["environment_id"], log_level=plugin_args.get("log")) as logger:
+    with geneva.actions.utils.Logger(plugin_args["output_directory"], __name__, "client", plugin_args["environment_id"], log_level=plugin_args.get("log")) as logger:
         client_plugin.start(plugin_args, logger)
 
 if __name__ == "__main__":

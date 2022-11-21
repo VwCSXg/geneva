@@ -26,8 +26,8 @@ from scapy.config import conf
 socket.setdefaulttimeout(1)
 
 import layers.packet
-import actions.strategy
-import actions.utils
+import geneva.actions.strategy
+import geneva.actions.utils
 
 BASEPATH = os.path.dirname(os.path.abspath(__file__))
 
@@ -79,12 +79,12 @@ class Engine():
             self.output_directory = "trials"
         else:
             self.output_directory = output_directory
-        actions.utils.setup_dirs(self.output_directory)
+        geneva.actions.utils.setup_dirs(self.output_directory)
         if not environment_id:
-            self.environment_id = actions.utils.get_id()
+            self.environment_id = geneva.actions.utils.get_id()
 
         # Set up a logger
-        self.logger = actions.utils.get_logger(BASEPATH,
+        self.logger = geneva.actions.utils.get_logger(BASEPATH,
                                                self.output_directory,
                                                __name__,
                                                "engine",
@@ -102,7 +102,7 @@ class Engine():
         self.enabled = enabled
 
         # Parse the given strategy
-        self.strategy = actions.utils.parse(string_strategy, self.logger)
+        self.strategy = geneva.actions.utils.parse(string_strategy, self.logger)
 
         # Setup variables used by the NFQueue system
         self.in_queue_num = in_queue_num or 1
@@ -121,7 +121,7 @@ class Engine():
         # for scapy to send packets more quickly than using just send(), as under the hood
         # send() creates and then destroys a socket each time, imparting a large amount
         # of overhead.
-        self.socket = conf.L3socket(iface=actions.utils.get_interface())
+        self.socket = conf.L3socket(iface=geneva.actions.utils.get_interface())
 
     def __enter__(self):
         """
@@ -249,7 +249,7 @@ class Engine():
             self.logger.debug(cmd)
             # If we're logging at debug mode, keep stderr/stdout piped to us
             # Otherwise, pipe them both to DEVNULL
-            if actions.utils.get_console_log_level() == "debug":
+            if geneva.actions.utils.get_console_log_level() == "debug":
                 subprocess.check_call(cmd.split(), timeout=60)
             else:
                 subprocess.check_call(cmd.split(), stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL, timeout=60)
@@ -335,7 +335,7 @@ class Engine():
             self.in_nfqueue_thread.join()
 
         # Shutdown the logger
-        actions.utils.close_logger(self.logger)
+        geneva.actions.utils.close_logger(self.logger)
 
     def out_callback(self, nfpacket):
         """
