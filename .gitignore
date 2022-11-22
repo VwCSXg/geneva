@@ -1,6 +1,7 @@
-__pycache__
-actions/__pycache__
-trials/*
+.idea/
 .vscode/
+
+__pycache__
+trials/*
 workers/*
 !workers/example
