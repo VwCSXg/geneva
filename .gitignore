@@ -4,4 +4,5 @@
 __pycache__
 trials/*
 workers/*
+*.log
 !workers/example
