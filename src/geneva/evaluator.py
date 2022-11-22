@@ -28,7 +28,7 @@ warnings.filterwarnings(action='ignore',module='.*paramiko.*')
 # Placeholder for a docker import (see below why we cannot import docker here)
 docker = None
 BASEPATH = os.path.dirname(os.path.abspath(__file__))
-PROJECT_ROOT = BASEPATH
+PROJECT_ROOT = os.path.dirname(os.path.dirname(BASEPATH))
 
 
 class Evaluator():
@@ -300,7 +300,7 @@ class Evaluator():
         else:
             self.run_local_client(args, environment, logger)
 
-        fitpath = os.path.join(BASEPATH, self.output_directory, geneva.actions.utils.FLAGFOLDER, environment["id"]) + ".fitness"
+        fitpath = os.path.join(PROJECT_ROOT, self.output_directory, geneva.actions.utils.FLAGFOLDER, environment["id"]) + ".fitness"
         # Do not overwrite the fitness if it already exists
         if not os.path.exists(fitpath):
             geneva.actions.utils.write_fitness(fitness, self.output_directory, environment["id"])
