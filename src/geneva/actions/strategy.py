@@ -85,7 +85,7 @@ class Strategy(object):
             # Initialize the in tree
             in_tree.initialize(num_in_actions, self.environment_id, disabled=disabled)
             # Add them to this strategy
-            self.in_geneva.actions.append(in_tree)
+            self.in_actions.append(in_tree)
 
         for _ in range(0, num_out_trees):
             # Define a new out action tree
@@ -93,7 +93,7 @@ class Strategy(object):
             # Initialize the out tree
             out_tree.initialize(num_out_actions, self.environment_id, disabled=disabled)
             # Add them to this strategy
-            self.out_geneva.actions.append(out_tree)
+            self.out_actions.append(out_tree)
 
 
     def act_on_packet(self, packet, logger, direction="out"):

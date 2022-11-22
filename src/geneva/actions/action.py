@@ -114,8 +114,8 @@ class Action():
             importlib.import_module("actions." + action)
             def check_action(obj):
                 return inspect.isclass(obj) and \
-                       issubclass(obj, genva.actions.action.Action) and \
-                       obj != genva.actions.action.Action and \
+                       issubclass(obj, Action) and \
+                       obj != Action and \
                        obj().applies(direction) and \
                        obj().enabled and \
                        not any([x in str(obj) for x in disabled]) and \

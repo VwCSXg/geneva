@@ -30,7 +30,7 @@ CONSOLE_LOG_LEVEL = "debug"
 
 
 BASEPATH = os.path.dirname(os.path.abspath(__file__))
-PROJECT_ROOT = os.path.dirname(BASEPATH)
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(BASEPATH)))
 
 
 class SkipStrategyException(Exception):

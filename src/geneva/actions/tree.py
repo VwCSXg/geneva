@@ -10,6 +10,7 @@ from anytree.exporter import DotExporter
 
 import geneva.actions.utils
 import geneva.actions.trigger
+from geneva.actions.action import Action
 
 
 class ActionTreeParseError(Exception):
@@ -411,7 +412,7 @@ class ActionTree():
         Retrieves and initializes a random action that can run in the given direction.
         """
         pick = random.random()
-        action_options = geneva.actions.action.Action.get_actions(direction, disabled=disabled, allow_terminal=allow_terminal)
+        action_options = Action.get_actions(direction, disabled=disabled, allow_terminal=allow_terminal)
         # Check to make sure there are still actions available to use
         assert action_options, "No actions were available"
         act_dict = {}
