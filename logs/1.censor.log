@@ -1,0 +1,14 @@
+[CENSOR] 2022-11-22 10:46:34,538 Censor created to port 80 on queue 0
+[CENSOR] 2022-11-22 10:46:34,538 Censor initializing.
+[CENSOR] 2022-11-22 10:46:34,546 Censor iptables added
+[CENSOR] 2022-11-22 10:46:34,546 Censor binding
+[CENSOR] 2022-11-22 10:46:34,546 Censor bound
+[CENSOR] 2022-11-22 10:46:58,602 CENSOR GOT SHUTDOWN
+[CENSOR] 2022-11-22 10:46:58,602 Shutting down censor.
+[CENSOR] 2022-11-22 10:49:48,053 Censor created to port 80 on queue 0
+[CENSOR] 2022-11-22 10:49:48,053 Censor initializing.
+[CENSOR] 2022-11-22 10:49:48,058 Censor iptables added
+[CENSOR] 2022-11-22 10:49:48,058 Censor binding
+[CENSOR] 2022-11-22 10:49:48,058 Censor bound
+[CENSOR] 2022-11-22 10:49:50,024 CENSOR GOT SHUTDOWN
+[CENSOR] 2022-11-22 10:49:50,025 Shutting down censor.

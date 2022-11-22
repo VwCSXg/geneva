@@ -358,7 +358,7 @@ class Evaluator():
         command = []
         if worker["username"] != "root":
             command = ["sudo"]
-        command += [worker["python"], os.path.join(worker["geneva_path"], "plugins/plugin_client.py")]
+        command += [worker["python"], os.path.join(worker["geneva_path"], "src/geneva/plugins/plugin_client.py")]
         base_cmd = geneva.actions.utils.build_command(args)
         command += base_cmd
         command = " ".join(command)

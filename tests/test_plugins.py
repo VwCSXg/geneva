@@ -17,7 +17,7 @@ def test_testserver(logger):
     path = os.path.join("plugins", "http")
     if path not in sys.path:
         sys.path.append(path)
-    from plugins.http.plugin import TestServer
+    from geneva.plugins.http.plugin import TestServer
     for _ in range(10):
         site = None
         with TestServer(site, None, {}, logger) as site:
@@ -26,14 +26,13 @@ def test_testserver(logger):
             req.raise_for_status()
             logger.info("Success")
 
-    import plugins.http.plugin
-    orig = plugins.http.plugin.TEST_SITES
+    orig = geneva.plugins.http.plugin.TEST_SITES
     try:
         # Overwrite the test sites with a failure case and a success case
-        plugins.http.plugin.TEST_SITES = ["http://nononono.no", "http://example.com"]
-        plugins.http.plugin.JAIL_TRACKER = {}
-        for site in plugins.http.plugin.TEST_SITES:
-            plugins.http.plugin.JAIL_TRACKER[site] = 0
+        geneva.plugins.http.plugin.TEST_SITES = ["http://nononono.no", "http://example.com"]
+        geneva.plugins.http.plugin.JAIL_TRACKER = {}
+        for site in geneva.plugins.http.plugin.TEST_SITES:
+            geneva.plugins.http.plugin.JAIL_TRACKER[site] = 0
 
         site = None
         with TestServer(site, None, {}, logger) as site:
@@ -43,10 +42,7 @@ def test_testserver(logger):
             req.raise_for_status()
             logger.info("Success")
     finally:
-        plugins.http.plugin.TEST_SITES = copy.deepcopy(orig)
-        plugins.http.plugin.JAIL_TRACKER = {}
-        for site in plugins.http.plugin.TEST_SITES:
-            plugins.http.plugin.JAIL_TRACKER[site] = 0
-
-
-
+        geneva.plugins.http.plugin.TEST_SITES = copy.deepcopy(orig)
+        geneva.plugins.http.plugin.JAIL_TRACKER = {}
+        for site in geneva.plugins.http.plugin.TEST_SITES:
+            geneva.plugins.http.plugin.JAIL_TRACKER[site] = 0

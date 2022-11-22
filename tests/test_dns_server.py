@@ -16,8 +16,7 @@ basepath = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe(
 parent_dir = os.path.dirname(basepath)
 sys.path.insert(0, parent_dir)
 
-import evolve
-from plugins.dns.server import DNSServer
+from geneva.plugins.dns.server import DNSServer
 
 # Default values
 INTERFACE = 'lo'
@@ -438,6 +437,3 @@ def check_records(server, answer, query, query_type, authority=False, error=None
 
     if authority is True:
         assert response[DNS_].aa == 1
-
-
-

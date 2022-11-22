@@ -15,8 +15,8 @@ import geneva.actions.trigger
 import geneva.actions.strategy
 import geneva.actions.tree
 import geneva.layers.packet
-import plugins.plugin_client
-import plugins.plugin_server
+from geneva import plugins
+import geneva.plugins.plugin_server
 
 from scapy.all import TCP, IP, UDP, rdpcap
 import netifaces
@@ -312,11 +312,11 @@ def import_plugin(plugin, side):
         Filters class members to ensure we get only enabled Plugin subclasses
         """
         return inspect.isclass(obj) and \
-                issubclass(obj, plugins.plugin.Plugin) and \
-                (obj != plugins.plugin_client.ClientPlugin and \
-                 obj != plugins.plugin_server.ServerPlugin and \
-                 obj != plugins.plugin.Plugin) and \
-                obj(None).enabled
+               issubclass(obj, plugins.plugin.Plugin) and \
+               (obj != geneva.plugins.plugin_client.ClientPlugin and \
+                obj != geneva.plugins.plugin_server.ServerPlugin and \
+                obj != plugins.plugin.Plugin) and \
+               obj(None).enabled
 
     # Filter the class members of the imported module to find our Plugin subclass
     clsmembers = inspect.getmembers(sys.modules[mod], predicate=check_plugin)
