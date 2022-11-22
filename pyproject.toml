@@ -4,6 +4,7 @@ version = "1.0"
 description = ""
 authors = []
 readme = "README.md"
+packages = [{include = "geneva", from = "src"}]
 
 [tool.poetry.dependencies]
 python = ">=3.7,<4"
