@@ -20,14 +20,14 @@ import requests
 socket.setdefaulttimeout(1)
 
 import engine
-import external_sites
-import actions.utils
+import geneva.plugins.http.external_sites
 
 from geneva.plugins.plugin import Plugin
+import geneva.actions.utils
 
 BASEPATH = os.path.dirname(os.path.abspath(__file__))
-PROJECT_ROOT = os.path.dirname(os.path.dirname(BASEPATH))
-TEST_SITES = copy.deepcopy(external_sites.EXTERNAL_SITES)
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(BASEPATH))))
+TEST_SITES = copy.deepcopy(geneva.plugins.http.external_sites.EXTERNAL_SITES)
 JAIL_TRACKER = {}
 for site in TEST_SITES:
     JAIL_TRACKER[site] = 0
@@ -104,7 +104,7 @@ class HTTPPluginRunner(Plugin):
                 elif "timed out" in line:
                     logger.debug("Connection timed out on %s" % dest)
                     evaluator.stop_server(environment, http_server)
-                    raise actions.utils.SkipStrategyException("Strategy broke TCP connection", -400)
+                    raise geneva.actions.utils.SkipStrategyException("Strategy broke TCP connection", -400)
             break
         return http_server, port
 
@@ -142,8 +142,8 @@ class HTTPPluginRunner(Plugin):
 
             # If the engine ran on the server side, ask that it punish fitness
             if args["server_side"]:
-                ind.fitness = actions.utils.punish_fitness(fitness, logger, eng)
-                actions.utils.write_fitness(ind.fitness, output_path, environment["id"])
+                ind.fitness = geneva.actions.utils.punish_fitness(fitness, logger, eng)
+                geneva.actions.utils.write_fitness(ind.fitness, output_path, environment["id"])
 
         if evaluator.server_cls and not evaluator.args.get("external_server") and not evaluator.act_as_middlebox:
             evaluator.stop_server(environment, server)

@@ -7,6 +7,8 @@ import requests
 import os
 import pytest
 
+import geneva.plugins.http.plugin
+
 # Many sites inside the external pool do not let multiple requests from travis,
 # making the test frequently have false negative failures.
 @pytest.mark.skip()

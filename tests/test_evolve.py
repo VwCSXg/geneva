@@ -12,6 +12,8 @@ import common
 import evolve
 import evaluator
 import geneva.actions.utils
+import geneva.actions.action
+import geneva.actions.tree
 import geneva.layers.packet
 from geneva.actions.tamper import TamperAction
 from scapy.all import IP, TCP, UDP

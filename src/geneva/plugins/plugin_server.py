@@ -8,7 +8,7 @@ import sys
 import time
 
 BASEPATH = os.path.dirname(os.path.abspath(__file__))
-PROJECT_ROOT = os.path.dirname(BASEPATH)
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(BASEPATH)))
 sys.path.append(PROJECT_ROOT)
 
 import geneva.actions.sniffer

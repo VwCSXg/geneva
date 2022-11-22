@@ -15,7 +15,8 @@ import geneva.actions.trigger
 import geneva.actions.strategy
 import geneva.actions.tree
 import geneva.layers.packet
-from geneva import plugins
+import geneva.plugins.plugin
+import geneva.plugins.plugin_client
 import geneva.plugins.plugin_server
 
 from scapy.all import TCP, IP, UDP, rdpcap
@@ -155,7 +156,7 @@ class CustomAdapter(logging.LoggerAdapter):
         super().__init__(logger, extras)
         self.handlers = logger.handlers
         self.ips = {}
-    
+
     def debug(self, msg, *args, **kwargs):
         """
         Print a debug message, uses logger.debug.
@@ -217,7 +218,7 @@ class CustomAdapter(logging.LoggerAdapter):
                     new_ip = self.get_ip(ip)
 
                     arg = arg.replace(ip, self.ips[ip])
-            
+
             new_args.append(arg)
 
         for ip in self.regex.findall(msg):
@@ -228,7 +229,7 @@ class CustomAdapter(logging.LoggerAdapter):
             new_ip = self.get_ip(ip)
 
             msg = msg.replace(ip, self.ips[ip])
-        
+
         return msg, tuple(new_args), kwargs
 
 def close_logger(logger):
@@ -282,8 +283,8 @@ def get_plugins():
     Iterates over this current directory to retrieve plugins.
     """
     plugins = []
-    for f in os.listdir(os.path.join(PROJECT_ROOT, "plugins")):
-        if os.path.isdir(os.path.join(PROJECT_ROOT, "plugins", f)) and "__pycache__" not in f:
+    for f in os.listdir(os.path.join(os.path.dirname(BASEPATH), "plugins")):
+        if os.path.isdir(os.path.join(os.path.dirname(BASEPATH), "plugins", f)) and "__pycache__" not in f:
             plugins.append(f)
     return plugins
 
@@ -297,11 +298,7 @@ def import_plugin(plugin, side):
     """
 
     # Define the full module for this plugin
-    mod = "plugins.%s.%s" % (plugin, side)
-
-    path = os.path.join(PROJECT_ROOT, "plugins", plugin)
-    if path not in sys.path:
-        sys.path.append(path)
+    mod = f"geneva.plugins.{plugin}.{side}"
 
     # Import the module
     importlib.import_module(mod)
@@ -312,10 +309,10 @@ def import_plugin(plugin, side):
         Filters class members to ensure we get only enabled Plugin subclasses
         """
         return inspect.isclass(obj) and \
-               issubclass(obj, plugins.plugin.Plugin) and \
-               (obj != geneva.plugins.plugin_client.ClientPlugin and \
-                obj != geneva.plugins.plugin_server.ServerPlugin and \
-                obj != plugins.plugin.Plugin) and \
+               issubclass(obj, geneva.plugins.plugin.Plugin) and \
+               (obj != geneva.plugins.plugin_client.ClientPlugin and
+                obj != geneva.plugins.plugin_server.ServerPlugin and
+                obj != geneva.plugins.plugin.Plugin) and \
                obj(None).enabled
 
     # Filter the class members of the imported module to find our Plugin subclass

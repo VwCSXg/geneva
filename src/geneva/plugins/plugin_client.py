@@ -6,13 +6,14 @@ import time
 from scapy.all import send, IP, TCP, Raw
 
 BASEPATH = os.path.dirname(os.path.abspath(__file__))
-PROJECT_ROOT = os.path.dirname(BASEPATH)
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(BASEPATH)))
 sys.path.append(PROJECT_ROOT)
 
 import geneva.actions.sniffer
 import engine
 
 from geneva.plugins.plugin import Plugin
+import geneva.actions.utils
 
 
 class ClientPlugin(Plugin):

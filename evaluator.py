@@ -472,7 +472,7 @@ class Evaluator():
             logger (:obj:`logging.Logger`): A logger to log with
         """
         # Launch the plugin client
-        command = [sys.executable, "plugins/plugin_client.py", "--plugin", self.client_cls.name]
+        command = [sys.executable, "-m" "geneva.plugins.plugin_client", "--plugin", self.client_cls.name]
         base_cmd = geneva.actions.utils.build_command(args)
         command += base_cmd
         # Replace strings of empty strings "''" with empty strings "", as subprocess will handle this correctly
