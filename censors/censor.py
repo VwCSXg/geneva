@@ -4,8 +4,8 @@ import logging
 import random
 import os
 
-import layers.packet
 import geneva.actions.utils
+import geneva.layers.packet
 
 # Squelch annoying scapy ::1 runtime errors
 logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
@@ -104,7 +104,7 @@ class Censor(object):
         Sends a packet with scapy.
         """
         if "TCP" in packet:
-            self.logger.debug(layers.packet.Packet._str_packet(packet))
+            self.logger.debug(geneva.layers.packet.Packet._str_packet(packet))
         send(packet, verbose=False)
         return
 

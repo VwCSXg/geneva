@@ -1,6 +1,6 @@
 import random
 
-from layers.layer import Layer
+from geneva.layers.layer import Layer
 from scapy.all import IP, fuzz, RandIP
 
 class IPLayer(Layer):

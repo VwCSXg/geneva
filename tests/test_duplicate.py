@@ -3,7 +3,7 @@ import sys
 sys.path.append("..")
 
 import geneva.actions.duplicate
-import layers.packet
+import geneva.layers.packet
 import geneva.actions.strategy
 import geneva.actions.utils
 import evolve
@@ -18,7 +18,7 @@ def test_duplicate(logger):
     duplicate = geneva.actions.duplicate.DuplicateAction()
     assert str(duplicate) == "duplicate", "Duplicate returned incorrect string representation: %s" % str(duplicate)
 
-    packet = layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1")/TCP(sport=2222, dport=3333, seq=100, ack=100, flags="S"))
+    packet = geneva.layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1") / TCP(sport=2222, dport=3333, seq=100, ack=100, flags="S"))
     packet1, packet2 = duplicate.run(packet, logger)
     assert id(packet1) != id(packet2), "Duplicate aliased packet objects"
     duplicate.mutate()

@@ -1,10 +1,12 @@
-import geneva.actions.utils
 import random
 import re
-import layers.packet
+
+import geneva.actions.utils
+import geneva.layers.packet
 
 FIXED_TRIGGER = None
 GAS_ENABLED = True
+
 
 class Trigger(object):
     def __init__(self, trigger_type, trigger_field, trigger_proto, trigger_value=0, environment_id=None, gas=None):
@@ -178,7 +180,7 @@ class Trigger(object):
         value = m.group(3)
 
         # Parse out the given value if necessary
-        value = layers.packet.Packet.parse(proto, field, value)
+        value = geneva.layers.packet.Packet.parse(proto, field, value)
 
         # Trigger gas is set to None if it is disabled
         trigger_gas = None

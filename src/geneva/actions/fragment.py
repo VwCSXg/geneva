@@ -1,9 +1,9 @@
 import random
 from geneva.actions.action import Action
-import layers.packet
 
 from scapy.all import IP, TCP, fragment
 
+from geneva.layers.packet import Packet
 
 MAX_UINT = 4294967295
 
@@ -88,8 +88,8 @@ class FragmentAction(Action):
         else:
             # packet can be fragmented as requested
             frags = self.fragment(packet.copy().packet, fragsize=self.fragsize*8)
-        packet1 = layers.packet.Packet(frags[0])
-        packet2 = layers.packet.Packet(frags[1])
+        packet1 = Packet(frags[0])
+        packet2 = Packet(frags[1])
         if self.correct_order:
             return packet1, packet2
         else:
@@ -132,8 +132,8 @@ class FragmentAction(Action):
         if not pkt2.haslayer("TCP"):
             pkt2 = IP(packet["IP"])/TCP(bytes(pkt2["IP"].load))
 
-        packet1 = layers.packet.Packet(pkt1)
-        packet2 = layers.packet.Packet(pkt2)
+        packet1 = Packet(pkt1)
+        packet2 = Packet(pkt2)
 
         # Reset packet2's SYN number
         if packet2["TCP"].seq + fragsize > MAX_UINT:

@@ -2,13 +2,12 @@ import pytest
 
 import geneva.actions.utils
 import geneva.actions.trigger
-import layers.packet
-import layers.layer
-import layers.tcp_layer
-import layers.dns_layer
-import layers.dnsqr_layer
-import layers.udp_layer
-import layers.ip_layer
+import geneva.layers.layer
+import geneva.layers.tcp_layer
+import geneva.layers.dns_layer
+import geneva.layers.dnsqr_layer
+import geneva.layers.udp_layer
+import geneva.layers.ip_layer
 import evolve
 
 from scapy.all import IP, TCP, UDP, DNS, DNSQR, Raw, DNSRR
@@ -19,7 +18,7 @@ def test_parse_layers():
     Tests layer parsing.
     """
     pkt = IP()/TCP()/Raw("")
-    packet = layers.packet.Packet(pkt)
+    packet = geneva.layers.packet.Packet(pkt)
     layers_l = list(packet.read_layers())
     assert layers_l[0].name == "IP"
     assert layers_l[1].name == "TCP"
@@ -34,9 +33,9 @@ def test_get_random():
     Tests get random
     """
 
-    tcplayer = layers.tcp_layer.TCPLayer(TCP())
+    tcplayer = geneva.layers.tcp_layer.TCPLayer(TCP())
     field, value = tcplayer.get_random()
-    assert field in layers.tcp_layer.TCPLayer.fields
+    assert field in geneva.layers.tcp_layer.TCPLayer.fields
 
 
 def test_gen_random():
@@ -44,7 +43,7 @@ def test_gen_random():
     Tests gen random
     """
     for i in range(0, 2000):
-        layer, field, value = layers.packet.Packet().gen_random()
+        layer, field, value = geneva.layers.packet.Packet().gen_random()
         assert layer in [DNS, TCP, UDP, IP, DNSQR]
 
 
@@ -54,14 +53,14 @@ def test_dnsqr():
     """
     pkt = UDP()/DNS(ancount=1)/DNSQR()
     pkt.show()
-    packet = layers.packet.Packet(pkt)
+    packet = geneva.layers.packet.Packet(pkt)
     packet.show()
     assert len(packet.layers) == 3
     assert "UDP" in packet.layers
     assert "DNS" in packet.layers
     assert "DNSQR" in packet.layers
     pkt = IP()/UDP()/DNS()/DNSQR()
-    packet = layers.packet.Packet(pkt)
+    packet = geneva.layers.packet.Packet(pkt)
     assert str(packet)
 
 
@@ -69,12 +68,12 @@ def test_load():
     """
     Tests loads.
     """
-    tcp = layers.tcp_layer.TCPLayer(TCP())
+    tcp = geneva.layers.tcp_layer.TCPLayer(TCP())
     load = tcp.gen("load")
     pkt = IP()/"datadata"
-    p = layers.packet.Packet(pkt)
+    p = geneva.layers.packet.Packet(pkt)
     assert p.get("IP", "load") == "datadata"
-    p2 = layers.packet.Packet(IP(bytes(p)))
+    p2 = geneva.layers.packet.Packet(IP(bytes(p)))
     assert p2.get("IP", "load") == "datadata"
     p2.set("IP", "load", "data2")
     # Check p is unchanged
@@ -88,9 +87,9 @@ def test_load():
     assert p2.get("IP", "chksum") == None
 
     pkt = IP()/TCP()/"datadata"
-    p = layers.packet.Packet(pkt)
+    p = geneva.layers.packet.Packet(pkt)
     assert p.get("TCP", "load") == "datadata"
-    p2 = layers.packet.Packet(IP(bytes(p)))
+    p2 = geneva.layers.packet.Packet(IP(bytes(p)))
     assert p2.get("TCP", "load") == "datadata"
     p2.set("TCP", "load", "data2")
     # Check p is unchanged
@@ -104,7 +103,7 @@ def test_parse_load(logger):
     """
     Tests load parsing.
     """
-    pkt = layers.packet.Packet(IP()/TCP()/"TYPE A\r\n")
+    pkt = geneva.layers.packet.Packet(IP() / TCP() / "TYPE A\r\n")
     print("Parsed: %s" % pkt.get("TCP", "load"))
 
     strat = geneva.actions.utils.parse("[TCP:load:TYPE%20A%0D%0A]-drop-| \/", logger)
@@ -120,12 +119,12 @@ def test_dns():
     """
     Tests DNS layer.
     """
-    dns = layers.dns_layer.DNSLayer(DNS())
+    dns = geneva.layers.dns_layer.DNSLayer(DNS())
     print(dns.gen("id"))
     assert dns.gen("id")
 
-    p = layers.packet.Packet(DNS(id=0xabcd))
-    p2 = layers.packet.Packet(DNS(bytes(p)))
+    p = geneva.layers.packet.Packet(DNS(id=0xabcd))
+    p2 = geneva.layers.packet.Packet(DNS(bytes(p)))
     assert p.get("DNS", "id") == 0xabcd
     assert p2.get("DNS", "id") == 0xabcd
 
@@ -133,13 +132,13 @@ def test_dns():
     assert p.get("DNS", "id") == 0xabcd # Check p is unchanged
     assert p2.get("DNS", "id") == 0x4321
 
-    dns = layers.packet.Packet(DNS(aa=1))
+    dns = geneva.layers.packet.Packet(DNS(aa=1))
     assert dns.get("DNS", "aa") == 1
     aa = dns.gen("DNS", "aa")
     assert aa == 0 or aa == 1
     assert dns.get("DNS", "aa") == 1 # Original value unchanged
 
-    dns = layers.packet.Packet(DNS(opcode=15))
+    dns = geneva.layers.packet.Packet(DNS(opcode=15))
     assert dns.get("DNS", "opcode") == 15
     opcode = dns.gen("DNS", "opcode")
     assert opcode >= 0 and opcode <= 15
@@ -148,7 +147,7 @@ def test_dns():
     dns.set("DNS", "opcode", 3)
     assert dns.get("DNS", "opcode") == 3
 
-    dns = layers.packet.Packet(DNS(qr=0))
+    dns = geneva.layers.packet.Packet(DNS(qr=0))
     assert dns.get("DNS", "qr") == 0
     qr = dns.gen("DNS", "qr")
     assert qr == 0 or qr == 1
@@ -157,7 +156,7 @@ def test_dns():
     dns.set("DNS", "qr", 1)
     assert dns.get("DNS", "qr") == 1
 
-    dns = layers.packet.Packet(DNS(arcount=0xAABB))
+    dns = geneva.layers.packet.Packet(DNS(arcount=0xAABB))
     assert dns.get("DNS", "arcount") == 0xAABB
     arcount = dns.gen("DNS", "arcount")
     assert arcount >= 0 and arcount <= 0xffff
@@ -166,13 +165,13 @@ def test_dns():
     dns.set("DNS", "arcount", 65432)
     assert dns.get("DNS", "arcount") == 65432
 
-    dns = layers.dns_layer.DNSLayer(DNS()/DNSQR(qname="example.com"))
+    dns = geneva.layers.dns_layer.DNSLayer(DNS() / DNSQR(qname="example.com"))
     assert isinstance(dns.get_next_layer(), DNSQR)
     print(dns.gen("id"))
     assert dns.gen("id")
 
-    p = layers.packet.Packet(DNS(id=0xabcd))
-    p2 = layers.packet.Packet(DNS(bytes(p)))
+    p = geneva.layers.packet.Packet(DNS(id=0xabcd))
+    p2 = geneva.layers.packet.Packet(DNS(bytes(p)))
     assert p.get("DNS", "id") == 0xabcd
     assert p2.get("DNS", "id") == 0xabcd
 
@@ -182,27 +181,27 @@ def test_read_layers():
     Tests the ability to read each layer
     """
     packet = IP() / UDP() / TCP() / DNS() / DNSQR(qname="example.com") / DNSQR(qname="example2.com") / DNSQR(qname="example3.com")
-    packet_geneva = layers.packet.Packet(packet)
+    packet_geneva = geneva.layers.packet.Packet(packet)
     packet_geneva.setup_layers()
 
     i = 0
     for layer in packet_geneva.read_layers():
         if i == 0:
-            assert isinstance(layer, layers.ip_layer.IPLayer)
+            assert isinstance(layer, geneva.layers.ip_layer.IPLayer)
         elif i == 1:
-            assert isinstance(layer, layers.udp_layer.UDPLayer)
+            assert isinstance(layer, geneva.layers.udp_layer.UDPLayer)
         elif i == 2:
-            assert isinstance(layer, layers.tcp_layer.TCPLayer)
+            assert isinstance(layer, geneva.layers.tcp_layer.TCPLayer)
         elif i == 3:
-            assert isinstance(layer, layers.dns_layer.DNSLayer)
+            assert isinstance(layer, geneva.layers.dns_layer.DNSLayer)
         elif i == 4:
-            assert isinstance(layer, layers.dnsqr_layer.DNSQRLayer)
+            assert isinstance(layer, geneva.layers.dnsqr_layer.DNSQRLayer)
             assert layer.layer.qname == b"example.com"
         elif i == 5:
-            assert isinstance(layer, layers.dnsqr_layer.DNSQRLayer)
+            assert isinstance(layer, geneva.layers.dnsqr_layer.DNSQRLayer)
             assert layer.layer.qname == b"example2.com"
         elif i == 6:
-            assert isinstance(layer, layers.dnsqr_layer.DNSQRLayer)
+            assert isinstance(layer, geneva.layers.dnsqr_layer.DNSQRLayer)
             assert layer.layer.qname == b"example3.com"
         i += 1
 
@@ -211,7 +210,7 @@ def test_multi_opts():
     Tests various option getting/setting.
     """
     pkt = IP()/TCP(options=[('MSS', 1460), ('SAckOK', b''), ('Timestamp', (4154603075, 0)), ('NOP', None), ('WScale', 7), ('md5header', b'abcd' * 8)])
-    packet = layers.packet.Packet(pkt)
+    packet = geneva.layers.packet.Packet(pkt)
     assert packet.get("TCP", "options-sackok") == ''
     assert packet.get("TCP", "options-mss") == 1460
     assert packet.get("TCP", "options-timestamp") == 4154603075
@@ -222,7 +221,7 @@ def test_multi_opts():
     assert packet.get("TCP", "options-timestamp") == 400000000
     assert packet.get("TCP", "options-wscale") == 7
     pkt = IP()/TCP(options=[('SAckOK', b''), ('Timestamp', (4154603075, 0)), ('NOP', None), ('WScale', 7)])
-    packet = layers.packet.Packet(pkt)
+    packet = geneva.layers.packet.Packet(pkt)
     # If the option isn't present, it will be returned as an empty string
     assert packet.get("TCP", "options-mss") == ''
     packet.set("TCP", "options-mss", "")
@@ -234,11 +233,11 @@ def test_options_eol():
     Tests options-eol.
     """
     pkt = TCP(options=[("EOL", None)])
-    p = layers.packet.Packet(pkt)
+    p = geneva.layers.packet.Packet(pkt)
     assert p.get("TCP", "options-eol") == ""
-    p2 = layers.packet.Packet(TCP(bytes(p)))
+    p2 = geneva.layers.packet.Packet(TCP(bytes(p)))
     assert p2.get("TCP", "options-eol") == ""
-    p = layers.packet.Packet(IP()/TCP(options=[]))
+    p = geneva.layers.packet.Packet(IP() / TCP(options=[]))
     assert p.get("TCP", "options-eol") == ""
     p.set("TCP", "options-eol", "")
     p.show()
@@ -256,8 +255,8 @@ def test_compression_fallback(logger):
     Test that compression does not touch a packet without DNS in it packet
     """
     pkt = UDP()
-    p = layers.packet.Packet(pkt)
-    p2 = layers.dns_layer.DNSLayer.dns_decompress(p, logger)
+    p = geneva.layers.packet.Packet(pkt)
+    p2 = geneva.layers.dns_layer.DNSLayer.dns_decompress(p, logger)
     assert p2 == p, "dns_decompress changed a non DNS packet"
 
 
@@ -266,11 +265,11 @@ def test_options_mss():
     Tests options-eol.
     """
     pkt = TCP(options=[("MSS", 1440)])
-    p = layers.packet.Packet(pkt)
+    p = geneva.layers.packet.Packet(pkt)
     assert p.get("TCP", "options-mss") == 1440
-    p2 = layers.packet.Packet(TCP(bytes(p)))
+    p2 = geneva.layers.packet.Packet(TCP(bytes(p)))
     assert p2.get("TCP", "options-mss") == 1440
-    p = layers.packet.Packet(TCP(options=[]))
+    p = geneva.layers.packet.Packet(TCP(options=[]))
     assert p.get("TCP", "options-mss") == ""
     p.set("TCP", "options-mss", 2880)
     p.show()
@@ -288,7 +287,7 @@ def check_get(protocol, field, value):
     """
     pkt = protocol()
     setattr(pkt, field, value)
-    packet = layers.packet.Packet(pkt)
+    packet = geneva.layers.packet.Packet(pkt)
     assert packet.get(protocol.__name__, field) == value
 
 
@@ -381,11 +380,11 @@ def check_set_get(protocol, field, value):
     """
     Checks if the get method worked for this protocol, field, and value.
     """
-    pkt = layers.packet.Packet(protocol())
+    pkt = geneva.layers.packet.Packet(protocol())
     pkt.set(protocol.__name__, field, value)
     assert pkt.get(protocol.__name__, field) == value
     # Rebuild the packet to confirm the type survived
-    pkt2 = layers.packet.Packet(protocol(bytes(pkt)))
+    pkt2 = geneva.layers.packet.Packet(protocol(bytes(pkt)))
     assert pkt2.get(protocol.__name__, field) == value, "Value %s for header %s didn't survive packet parsing." % (value, field)
 
 
@@ -403,12 +402,12 @@ def check_gen_set_get(protocol, field):
     """
     Checks if the get method worked for this protocol, field, and value.
     """
-    pkt = layers.packet.Packet(protocol())
+    pkt = geneva.layers.packet.Packet(protocol())
     new_value = pkt.gen(protocol.__name__, field)
     pkt.set(protocol.__name__, field, new_value)
     assert pkt.get(protocol.__name__, field) == new_value
     # Rebuild the packet to confirm the type survived
-    pkt2 = layers.packet.Packet(protocol(bytes(pkt)))
+    pkt2 = geneva.layers.packet.Packet(protocol(bytes(pkt)))
     assert pkt2.get(protocol.__name__, field) == new_value
 
 
@@ -429,7 +428,7 @@ def test_custom_get():
     Tests value retrieval for custom getters.
     """
     pkt = IP()/TCP()/Raw(load="AAAA")
-    tcp = layers.packet.Packet(pkt)
+    tcp = geneva.layers.packet.Packet(pkt)
     assert tcp.get("TCP", "load") == "AAAA"
 
 
@@ -437,51 +436,51 @@ def test_restrict_fields(logger):
     """
     Tests packet field restriction.
     """
-    layers.packet.SUPPORTED_LAYERS = [
-        layers.ip_layer.IPLayer,
-        layers.tcp_layer.TCPLayer,
-        layers.udp_layer.UDPLayer
+    geneva.layers.packet.SUPPORTED_LAYERS = [
+        geneva.layers.ip_layer.IPLayer,
+        geneva.layers.tcp_layer.TCPLayer,
+        geneva.layers.udp_layer.UDPLayer
     ]
-    tcpfields = layers.tcp_layer.TCPLayer.fields
-    udpfields = layers.udp_layer.UDPLayer.fields
-    ipfields = layers.ip_layer.IPLayer.fields
+    tcpfields = geneva.layers.tcp_layer.TCPLayer.fields
+    udpfields = geneva.layers.udp_layer.UDPLayer.fields
+    ipfields = geneva.layers.ip_layer.IPLayer.fields
 
-    layers.packet.Packet.restrict_fields(logger, ["TCP", "UDP"], [], [])
-    assert len(layers.packet.SUPPORTED_LAYERS) == 2
-    assert layers.tcp_layer.TCPLayer in layers.packet.SUPPORTED_LAYERS
-    assert layers.udp_layer.UDPLayer in layers.packet.SUPPORTED_LAYERS
-    assert not layers.ip_layer.IPLayer in layers.packet.SUPPORTED_LAYERS
+    geneva.layers.packet.Packet.restrict_fields(logger, ["TCP", "UDP"], [], [])
+    assert len(geneva.layers.packet.SUPPORTED_LAYERS) == 2
+    assert geneva.layers.tcp_layer.TCPLayer in geneva.layers.packet.SUPPORTED_LAYERS
+    assert geneva.layers.udp_layer.UDPLayer in geneva.layers.packet.SUPPORTED_LAYERS
+    assert not geneva.layers.ip_layer.IPLayer in geneva.layers.packet.SUPPORTED_LAYERS
 
     pkt = IP()/TCP()
-    packet = layers.packet.Packet(pkt)
+    packet = geneva.layers.packet.Packet(pkt)
     assert "TCP" in packet.layers
     assert not "IP" in packet.layers
     assert len(packet.layers) == 1
 
     for i in range(0, 2000):
-        layer, proto, field = layers.packet.Packet().gen_random()
+        layer, proto, field = geneva.layers.packet.Packet().gen_random()
         assert layer in [TCP, UDP]
 
     # Check we can't retrieve any IP fields
-    for field in layers.ip_layer.IPLayer.fields:
+    for field in geneva.layers.ip_layer.IPLayer.fields:
         with pytest.raises(AssertionError):
             packet.get("IP", field)
 
     # Check we can get all the TCP fields
-    for field in layers.tcp_layer.TCPLayer.fields:
+    for field in geneva.layers.tcp_layer.TCPLayer.fields:
         packet.get("TCP", field)
 
-    layers.packet.Packet.restrict_fields(logger, ["TCP", "UDP"], ["flags"], [])
-    packet = layers.packet.Packet(pkt)
-    assert len(layers.packet.SUPPORTED_LAYERS) == 1
-    assert layers.tcp_layer.TCPLayer in layers.packet.SUPPORTED_LAYERS
-    assert not layers.udp_layer.UDPLayer in layers.packet.SUPPORTED_LAYERS
-    assert not layers.ip_layer.IPLayer in layers.packet.SUPPORTED_LAYERS
-    assert layers.tcp_layer.TCPLayer.fields == ["flags"]
-    assert not layers.udp_layer.UDPLayer.fields
+    geneva.layers.packet.Packet.restrict_fields(logger, ["TCP", "UDP"], ["flags"], [])
+    packet = geneva.layers.packet.Packet(pkt)
+    assert len(geneva.layers.packet.SUPPORTED_LAYERS) == 1
+    assert geneva.layers.tcp_layer.TCPLayer in geneva.layers.packet.SUPPORTED_LAYERS
+    assert not geneva.layers.udp_layer.UDPLayer in geneva.layers.packet.SUPPORTED_LAYERS
+    assert not geneva.layers.ip_layer.IPLayer in geneva.layers.packet.SUPPORTED_LAYERS
+    assert geneva.layers.tcp_layer.TCPLayer.fields == ["flags"]
+    assert not geneva.layers.udp_layer.UDPLayer.fields
 
     # Check we can't retrieve any IP fields
-    for field in layers.ip_layer.IPLayer.fields:
+    for field in geneva.layers.ip_layer.IPLayer.fields:
         with pytest.raises(AssertionError):
             packet.get("IP", field)
 
@@ -494,37 +493,37 @@ def test_restrict_fields(logger):
                 packet.get("TCP", field)
 
     for i in range(0, 2000):
-        layer, field, value = layers.packet.Packet().gen_random()
+        layer, field, value = geneva.layers.packet.Packet().gen_random()
         assert layer == TCP
         assert field == "flags"
 
         _, proto, field, value, _ = geneva.actions.trigger.Trigger.get_rand_trigger(None, 0)
         assert proto == 'TCP'
         assert field == "flags"
-    layers.packet.Packet.reset_restrictions()
-    layers.packet.SUPPORTED_LAYERS = [
-        layers.ip_layer.IPLayer,
-        layers.tcp_layer.TCPLayer,
-        layers.udp_layer.UDPLayer
+    geneva.layers.packet.Packet.reset_restrictions()
+    geneva.layers.packet.SUPPORTED_LAYERS = [
+        geneva.layers.ip_layer.IPLayer,
+        geneva.layers.tcp_layer.TCPLayer,
+        geneva.layers.udp_layer.UDPLayer
     ]
 
     with pytest.raises(AssertionError):
-        layers.packet.Packet.restrict_fields(logger, ["TCP", "IP"], ["notathing"], ["notathing"])
-    layers.packet.Packet.reset_restrictions()
+        geneva.layers.packet.Packet.restrict_fields(logger, ["TCP", "IP"], ["notathing"], ["notathing"])
+    geneva.layers.packet.Packet.reset_restrictions()
 
-    layers.packet.Packet.restrict_fields(logger, ["TCP", "IP"], [], ["sport", "dport", "seq", "src"])
-    packet = layers.packet.Packet(pkt)
+    geneva.layers.packet.Packet.restrict_fields(logger, ["TCP", "IP"], [], ["sport", "dport", "seq", "src"])
+    packet = geneva.layers.packet.Packet(pkt)
     packet = packet.copy()
     assert packet.has_supported_layers()
-    assert len(layers.packet.SUPPORTED_LAYERS) == 2
-    assert layers.tcp_layer.TCPLayer in layers.packet.SUPPORTED_LAYERS
-    assert not layers.udp_layer.UDPLayer in layers.packet.SUPPORTED_LAYERS
-    assert layers.ip_layer.IPLayer in layers.packet.SUPPORTED_LAYERS
-    assert set(layers.tcp_layer.TCPLayer.fields) == set([f for f in tcpfields if f not in ["sport", "dport", "seq"]])
-    assert set(layers.ip_layer.IPLayer.fields) == set([f for f in ipfields if f not in ["src"]])
+    assert len(geneva.layers.packet.SUPPORTED_LAYERS) == 2
+    assert geneva.layers.tcp_layer.TCPLayer in geneva.layers.packet.SUPPORTED_LAYERS
+    assert not geneva.layers.udp_layer.UDPLayer in geneva.layers.packet.SUPPORTED_LAYERS
+    assert geneva.layers.ip_layer.IPLayer in geneva.layers.packet.SUPPORTED_LAYERS
+    assert set(geneva.layers.tcp_layer.TCPLayer.fields) == set([f for f in tcpfields if f not in ["sport", "dport", "seq"]])
+    assert set(geneva.layers.ip_layer.IPLayer.fields) == set([f for f in ipfields if f not in ["src"]])
 
     # Check we can't retrieve any IP fields
-    for field in layers.ip_layer.IPLayer.fields:
+    for field in geneva.layers.ip_layer.IPLayer.fields:
         if field == "src":
             with pytest.raises(AssertionError):
                 packet.get("IP", field)
@@ -540,7 +539,7 @@ def test_restrict_fields(logger):
             packet.get("TCP", field)
 
     for i in range(0, 2000):
-        layer, field, value = layers.packet.Packet().gen_random()
+        layer, field, value = geneva.layers.packet.Packet().gen_random()
         assert layer in [TCP, IP]
         assert field not in ["sport", "dport", "seq", "src"]
 
@@ -548,24 +547,24 @@ def test_restrict_fields(logger):
         assert proto in ['TCP', 'IP']
         assert field not in ["sport", "dport", "seq", "src"]
 
-    layers.packet.Packet.reset_restrictions()
-    layers.packet.SUPPORTED_LAYERS = [
-        layers.ip_layer.IPLayer,
-        layers.tcp_layer.TCPLayer,
-        layers.udp_layer.UDPLayer
+    geneva.layers.packet.Packet.reset_restrictions()
+    geneva.layers.packet.SUPPORTED_LAYERS = [
+        geneva.layers.ip_layer.IPLayer,
+        geneva.layers.tcp_layer.TCPLayer,
+        geneva.layers.udp_layer.UDPLayer
     ]
 
     evolve.restrict_headers(logger, "ip,udp,dns", "", "version")
-    packet = layers.packet.Packet(pkt)
+    packet = geneva.layers.packet.Packet(pkt)
     proto, field, value = packet.get_random()
     assert proto.__name__ in ["IP", "UDP"]
-    assert len(layers.packet.SUPPORTED_LAYERS) == 2
-    assert not layers.tcp_layer.TCPLayer in layers.packet.SUPPORTED_LAYERS
-    assert layers.udp_layer.UDPLayer in layers.packet.SUPPORTED_LAYERS
-    assert layers.ip_layer.IPLayer in layers.packet.SUPPORTED_LAYERS
-    assert set(layers.ip_layer.IPLayer.fields) == set([f for f in ipfields if f not in ["version"]])
-    assert set(layers.udp_layer.UDPLayer.fields) == set(udpfields)
+    assert len(geneva.layers.packet.SUPPORTED_LAYERS) == 2
+    assert not geneva.layers.tcp_layer.TCPLayer in geneva.layers.packet.SUPPORTED_LAYERS
+    assert geneva.layers.udp_layer.UDPLayer in geneva.layers.packet.SUPPORTED_LAYERS
+    assert geneva.layers.ip_layer.IPLayer in geneva.layers.packet.SUPPORTED_LAYERS
+    assert set(geneva.layers.ip_layer.IPLayer.fields) == set([f for f in ipfields if f not in ["version"]])
+    assert set(geneva.layers.udp_layer.UDPLayer.fields) == set(udpfields)
 
-    layers.packet.Packet.reset_restrictions()
-    for layer in layers.packet.SUPPORTED_LAYERS:
+    geneva.layers.packet.Packet.reset_restrictions()
+    for layer in geneva.layers.packet.SUPPORTED_LAYERS:
         assert layer.fields, '%s has no fields - reset failed!' % str(layer)

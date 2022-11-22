@@ -8,11 +8,12 @@ drops all packets after a TCP forbidden keyword is detected.
 """
 
 import logging
-import layers.packet
+
 logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
 from scapy.all import IP, TCP
 
 from censors.censor import Censor
+import geneva.layers.packet
 
 
 class Censor1(Censor):
@@ -33,7 +34,7 @@ class Censor1(Censor):
         Check if the censor should run against this packet. Returns true or false.
         """
         try:
-            self.logger.debug("Inbound packet to censor: " + layers.packet.Packet._str_packet(packet))
+            self.logger.debug("Inbound packet to censor: " + geneva.layers.packet.Packet._str_packet(packet))
             if self.drop_all_from == packet["IP"].src:
                 self.logger.debug("Dropping all from this IP %s..." % self.drop_all_from)
                 return True
@@ -52,13 +53,13 @@ class Censor1(Censor):
             if packet["TCP"].seq == self.tcb:
                 self.tcb += len(self.get_payload(packet))
             else:
-                self.logger.debug("Ignoring packet: " + layers.packet.Packet._str_packet(packet))
+                self.logger.debug("Ignoring packet: " + geneva.layers.packet.Packet._str_packet(packet))
                 return False
 
             # Check if any forbidden words appear in the packet payload
             for keyword in self.forbidden:
                 if keyword in self.get_payload(packet):
-                    self.logger.debug("Packet triggered censor: " + layers.packet.Packet._str_packet(packet))
+                    self.logger.debug("Packet triggered censor: " + geneva.layers.packet.Packet._str_packet(packet))
                     return True
 
             return False
@@ -73,14 +74,3 @@ class Censor1(Censor):
         self.drop_all_from = scapy_packet["IP"].src
         self.logger.debug("Marking IP %s for dropping..." % self.drop_all_from)
         return "drop"
-
-
-
-
-
-
-
-
-
-
-

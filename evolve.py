@@ -14,7 +14,7 @@ import sys
 
 from geneva.actions import utils, tree, strategy, trigger
 import evaluator
-import layers.packet
+from geneva import layers
 
 # Grab the terminal size for printing
 try:

@@ -23,9 +23,8 @@ import requests
 from scapy.all import *
 
 import geneva.actions.utils
+import geneva.layers.packet
 from plugins.plugin import Plugin
-
-import layers.packet
 
 BASEPATH = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(os.path.dirname(BASEPATH))
@@ -131,7 +130,7 @@ class AmplificationPluginRunner(Plugin):
                 IP(dst=dst)/TCP(sport=sport, dport=dport, flags="A", ack=ack, seq=seq+1),
                 IP(dst=dst)/TCP(sport=sport, dport=dport, flags="PA", ack=ack, seq=seq+1)/Raw(payload)
             ]
-            packets = [layers.packet.Packet(packet) for packet in packets]
+            packets = [geneva.layers.packet.Packet(packet) for packet in packets]
 
             packets_to_send = []
             try:

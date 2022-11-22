@@ -2,10 +2,10 @@ import sys
 # Include the root of the project
 sys.path.append("..")
 
-import layers.packet
 import geneva.actions.strategy
 import geneva.actions.tamper
-import geneva.actions.utils
+import geneva.actions.trigger
+import geneva.layers.packet
 import evolve
 
 from scapy.all import IP, TCP
@@ -23,7 +23,7 @@ def test_init(logger):
     """
     Tests initialization.
     """
-    packet = layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1")/TCP(sport=2222, dport=3333, seq=100, ack=100, flags="S"))
+    packet = geneva.layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1") / TCP(sport=2222, dport=3333, seq=100, ack=100, flags="S"))
     trigger = geneva.actions.trigger.Trigger(None, None, None)
     trigger.is_applicable(packet, logger)
 
@@ -35,7 +35,7 @@ def test_trigger_gas(logger):
     """
     Tests triggers having gas, including changing that gas while in use
     """
-    packet = layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1")/TCP(sport=2222, dport=3333, seq=100, ack=100, flags="SA"))
+    packet = geneva.layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1") / TCP(sport=2222, dport=3333, seq=100, ack=100, flags="SA"))
     trigger = geneva.actions.trigger.Trigger("field", "flags", "TCP", trigger_value="SA", gas=1)
     print(trigger)
     assert trigger.is_applicable(packet, logger)
@@ -66,7 +66,7 @@ def test_bomb_trigger_gas(logger):
     """
     Tests triggers having bomb gas, including changing that gas while in use
     """
-    packet = layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1")/TCP(sport=2222, dport=3333, seq=100, ack=100, flags="SA"))
+    packet = geneva.layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1") / TCP(sport=2222, dport=3333, seq=100, ack=100, flags="SA"))
     trigger = geneva.actions.trigger.Trigger("field", "flags", "TCP", trigger_value="SA", gas=-1)
     print(trigger)
     assert not trigger.is_applicable(packet, logger), "trigger should not fire on first run"
@@ -98,7 +98,7 @@ def test_trigger_parse_gas(logger):
     """
     Tests triggers having gas, including changing that gas while in use
     """
-    packet = layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1")/TCP(sport=2222, dport=3333, seq=100, ack=100, flags="SA"))
+    packet = geneva.layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1") / TCP(sport=2222, dport=3333, seq=100, ack=100, flags="SA"))
 
 
     # parse a trigger with 1 gas
@@ -132,7 +132,7 @@ def test_bomb_trigger_parse_gas(logger):
     """
     Tests bomb triggers having gas, including changing that gas while in use
     """
-    packet = layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1")/TCP(sport=2222, dport=3333, seq=100, ack=100, flags="SA"))
+    packet = geneva.layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1") / TCP(sport=2222, dport=3333, seq=100, ack=100, flags="SA"))
 
     # parse a bomb trigger with 1 gas
     trigger = geneva.actions.trigger.Trigger.parse("TCP:flags:SA:-1")
@@ -168,10 +168,10 @@ def test_wildcard(logger):
     """
     Test wildcard trigger value
     """
-    packet_1 = layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1")/TCP(sport=2222, dport=3333, seq=100, ack=100, flags="A"))
-    packet_2 = layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1")/TCP(sport=2222, dport=3333, seq=100, ack=100, flags="SA"))
-    packet_3 = layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1")/TCP(sport=2222, dport=3333, seq=100, ack=100, flags="RA"))
-    packet_4 = layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1")/TCP(sport=2222, dport=3333, seq=100, ack=100, flags="P"))
+    packet_1 = geneva.layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1") / TCP(sport=2222, dport=3333, seq=100, ack=100, flags="A"))
+    packet_2 = geneva.layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1") / TCP(sport=2222, dport=3333, seq=100, ack=100, flags="SA"))
+    packet_3 = geneva.layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1") / TCP(sport=2222, dport=3333, seq=100, ack=100, flags="RA"))
+    packet_4 = geneva.layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1") / TCP(sport=2222, dport=3333, seq=100, ack=100, flags="P"))
     trigger = geneva.actions.trigger.Trigger("field", "flags", "TCP", trigger_value="A*", gas=None)
     assert trigger.is_applicable(packet_1, logger)
     assert trigger.is_applicable(packet_2, logger)

@@ -1,12 +1,12 @@
 import copy
 import random
 
-import layers.layer
-import layers.ip_layer
-import layers.tcp_layer
-import layers.udp_layer
-import layers.dns_layer
-import layers.dnsqr_layer
+from geneva import layers
+import geneva.layers.ip_layer
+import geneva.layers.tcp_layer
+import geneva.layers.udp_layer
+import geneva.layers.dns_layer
+import geneva.layers.dnsqr_layer
 
 _SUPPORTED_LAYERS = [
     layers.ip_layer.IPLayer,

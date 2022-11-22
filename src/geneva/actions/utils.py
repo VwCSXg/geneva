@@ -12,7 +12,9 @@ import random
 import struct
 
 import geneva.actions.trigger
-import layers.packet
+import geneva.actions.strategy
+import geneva.actions.tree
+import geneva.layers.packet
 import plugins.plugin_client
 import plugins.plugin_server
 
@@ -393,11 +395,11 @@ def get_from_fuzzed_or_real_packet(environment_id, real_packet_probability, enab
     Retrieves a protocol, field, and value from a fuzzed or real packet, depending on
     the given probability and if given packets is not None.
     """
-    packets = geneva.actions.utils.read_packets(environment_id)
+    packets = read_packets(environment_id)
     if packets and random.random() < real_packet_probability:
         packet = random.choice(packets)
         return packet.get_random()
-    return layers.packet.Packet().gen_random()
+    return geneva.layers.packet.Packet().gen_random()
 
 
 def read_packets(environment_id):
@@ -415,7 +417,7 @@ def read_packets(environment_id):
     parsed = []
     try:
         packets = rdpcap(packets_path)
-        parsed = [layers.packet.Packet(p) for p in packets]
+        parsed = [geneva.layers.packet.Packet(p) for p in packets]
     except Exception as e:
         print(e)
         print("FAILED TO PARSE!")

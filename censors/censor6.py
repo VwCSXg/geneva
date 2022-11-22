@@ -4,10 +4,9 @@ FIN or RST packet.
 Does not check if the ports are correct for the FIN/RST.
 
 """
-import layers.packet
 import logging
 logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
-from scapy.all import IP, TCP
+import geneva.layers.packet
 
 from censors.censor import Censor
 
@@ -24,7 +23,7 @@ class Censor6(Censor):
         Check if the censor should run against this packet. Returns true or false.
         """
         try:
-            self.logger.debug("Inbound packet to censor: " + layers.packet.Packet._str_packet(packet))
+            self.logger.debug("Inbound packet to censor: " + geneva.layers.packet.Packet._str_packet(packet))
             if self.drop_all_from == packet["IP"].src:
                 self.logger.debug("Dropping all from this IP %s..." % self.drop_all_from)
                 return True
@@ -36,17 +35,17 @@ class Censor6(Censor):
             # Some stacks send RA to tear down a connection
             if packet["TCP"].sprintf('%TCP.flags%') in ["R", "RA", "F"]:
                 self.tcb = None
-                self.logger.debug(("Tearing down TCB on packet " + layers.packet.Packet._str_packet(packet)))
+                self.logger.debug(("Tearing down TCB on packet " + geneva.layers.packet.Packet._str_packet(packet)))
                 return False
 
             if self.tcb is None:
-                self.logger.debug("Ignoring packet: " + layers.packet.Packet._str_packet(packet))
+                self.logger.debug("Ignoring packet: " + geneva.layers.packet.Packet._str_packet(packet))
                 return False
 
             # Check if any forbidden words appear in the packet payload
             for keyword in self.forbidden:
                 if keyword in self.get_payload(packet):
-                    self.logger.debug("Packet triggered censor: " + layers.packet.Packet._str_packet(packet))
+                    self.logger.debug("Packet triggered censor: " + geneva.layers.packet.Packet._str_packet(packet))
                     return True
 
             return False

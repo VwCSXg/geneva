@@ -1,7 +1,7 @@
 from scapy.all import IP, TCP
 import geneva.actions.utils
 import geneva.actions.strategy
-import layers.packet
+import geneva.layers.packet
 import geneva.actions.sleep
 import sys
 # Include the root of the project
@@ -15,7 +15,7 @@ def test_basic_sleep(logger):
     sleep = geneva.actions.sleep.SleepAction(.5)
     assert str(sleep) == "sleep{0.5}", "Sleep returned incorrect string representation: %s" % str(sleep)
 
-    packet = layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1")/TCP()/("data"))
+    packet = geneva.layers.packet.Packet(IP(src="127.0.0.1", dst="127.0.0.1") / TCP() / ("data"))
     packet1, packet2 = sleep.run(packet, logger)
 
     assert packet1.sleep == .5, "Packet had wrong sleep value"

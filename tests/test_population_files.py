@@ -4,7 +4,7 @@ sys.path.append("..") # Include the root of the project
 import evolve
 import os
 import geneva.actions.utils
-import layers.layer
+import geneva.layers.packet
 
 # Test Files Directory Setup
 test_files_directory = os.path.join("test_files")
@@ -98,7 +98,7 @@ def test_evolve_load_generation(logger):
     """
 
     generations = 2
-    layers.packet.Packet.reset_restrictions()
+    geneva.layers.packet.Packet.reset_restrictions()
 
     options = {}
     options["population_size"] = 2

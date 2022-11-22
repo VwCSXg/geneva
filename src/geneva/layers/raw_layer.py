@@ -1,4 +1,4 @@
-from layers.layer import Layer
+from geneva.layers.layer import Layer
 
 class RawLayer(Layer):
     """

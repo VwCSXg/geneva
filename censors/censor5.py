@@ -7,7 +7,7 @@ TCP Censor that synchronizes on first SYN only, works 100% of the time, sends 5 
 the server only.
 """
 
-import layers.packet
+import geneva.layers.packet
 import logging
 import netifaces
 # Disable scapy ::1 warnings
@@ -42,25 +42,25 @@ class Censor5(Censor):
             self.num += 1
 
             # Only censor TCP packets for now
-            self.logger.debug("Inbound packet to censor: " + layers.packet.Packet._str_packet(packet))
+            self.logger.debug("Inbound packet to censor: " + geneva.layers.packet.Packet._str_packet(packet))
             if "TCP" not in packet:
                 return False
 
             if packet["TCP"].sprintf('%TCP.flags%') == "S":
                 self.tcb = packet["TCP"].seq + 1
-                self.logger.debug("Synchronizing TCB on packet " + layers.packet.Packet._str_packet(packet))
+                self.logger.debug("Synchronizing TCB on packet " + geneva.layers.packet.Packet._str_packet(packet))
                 return False
 
             if packet["TCP"].seq == self.tcb:
                 self.tcb += len(self.get_payload(packet))
 
             else:
-                self.logger.debug("Ignoring packet: " + layers.packet.Packet._str_packet(packet))
+                self.logger.debug("Ignoring packet: " + geneva.layers.packet.Packet._str_packet(packet))
                 return False
 
             for keyword in self.forbidden:
                 if keyword in self.get_payload(packet):
-                    self.logger.debug("Packet triggered censor: " + layers.packet.Packet._str_packet(packet))
+                    self.logger.debug("Packet triggered censor: " + geneva.layers.packet.Packet._str_packet(packet))
                     return True
 
             return False

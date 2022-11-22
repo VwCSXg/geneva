@@ -7,6 +7,7 @@ into and out of that port so the strategy can run over the connection.
 
 import argparse
 import logging
+
 logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
 import os
 import socket
@@ -25,9 +26,9 @@ from scapy.config import conf
 
 socket.setdefaulttimeout(1)
 
-import layers.packet
 import geneva.actions.strategy
 import geneva.actions.utils
+import geneva.layers.packet
 
 BASEPATH = os.path.dirname(os.path.abspath(__file__))
 
@@ -344,7 +345,7 @@ class Engine():
         if not self.running_nfqueue:
             return
 
-        packet = layers.packet.Packet(IP(nfpacket.get_payload()))
+        packet = geneva.layers.packet.Packet(IP(nfpacket.get_payload()))
         self.logger.debug("Received outbound packet %s", str(packet))
 
         # Record this packet for a .pacp later
@@ -380,7 +381,7 @@ class Engine():
         """
         if not self.running_nfqueue:
             return
-        packet = layers.packet.Packet(IP(nfpacket.get_payload()))
+        packet = geneva.layers.packet.Packet(IP(nfpacket.get_payload()))
 
         if self.save_seen_packets:
             self.seen_packets.append(packet)
