@@ -5,8 +5,7 @@ import random
 # Include the root of the project
 sys.path.append("..")
 
-import evolve
-import evaluator
+from geneva import evaluator, evolve
 import geneva.actions.strategy
 import geneva.actions.utils
 import geneva.actions.tamper

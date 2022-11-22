@@ -7,7 +7,7 @@ import geneva.layers.packet
 BASEPATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(BASEPATH)
 
-import engine
+from geneva import engine
 
 def test_engine():
     """

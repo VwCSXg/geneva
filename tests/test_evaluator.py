@@ -7,13 +7,11 @@ import geneva.actions.drop
 import geneva.actions.duplicate
 import geneva.actions.utils
 import geneva.actions.strategy
-import evaluator
-import evolve
+from geneva import evaluator
 import common
 
 import netifaces
 
-from pprint import pprint
 
 @pytest.mark.parametrize("extra_args", [[], ["--no-fitness-file"], ["--workers", "2"]], ids=["with_fitness_file", "no_fitness_file", "two_workers"])
 def test_evaluator_http_client(logger, extra_args):
@@ -604,13 +602,13 @@ def test_evaluator_get_ip(logger):
     Tests evaluator skip_empty flag.
     """
     # Create an evaluator
-    tester = evaluator.Evaluator(logger,                  # logger for the session
-                                 "censor2",               # internal censor
-                                 None,                    # no external server
-                                 geneva.actions.utils.RUN_DIRECTORY, # directory to log
-                                 workers=4,               # workers to use
-                                 runs=1,                  # only need 1 run
-                                 test_type="echo",        # use echo test
+    tester = evaluator.Evaluator(logger,  # logger for the session
+                                 "censor2",  # internal censor
+                                 None,  # no external server
+                                 geneva.actions.utils.RUN_DIRECTORY,  # directory to log
+                                 workers=4,  # workers to use
+                                 runs=1,  # only need 1 run
+                                 test_type="echo",  # use echo test
                                  skip_empty=True)         # skip empty strats
     ip = tester.get_ip()
     tester.public_ip = "1.1.1.1"
@@ -622,13 +620,13 @@ def test_evaluator_external_server(logger):
     """
     Tests evaluator skip_empty flag.
     """
-    tester = evaluator.Evaluator(logger,                  # logger for the session
-                                 None,                    # no internal censor
-                                 "http://facebook.com",   # try to talk to facebook
-                                 geneva.actions.utils.RUN_DIRECTORY, # directory to log
-                                 workers=1,               # workers to use
-                                 runs=1,                  # only need 1 run
-                                 test_type="http",        # use http test
+    tester = evaluator.Evaluator(logger,  # logger for the session
+                                 None,  # no internal censor
+                                 "http://facebook.com",  # try to talk to facebook
+                                 geneva.actions.utils.RUN_DIRECTORY,  # directory to log
+                                 workers=1,  # workers to use
+                                 runs=1,  # only need 1 run
+                                 test_type="http",  # use http test
                                  skip_empty=False)        # don't skip empty strats
 
     population = [
@@ -639,13 +637,13 @@ def test_evaluator_external_server(logger):
     inds = tester.evaluate(population)
     assert inds[0].fitness == 400
 
-    tester = evaluator.Evaluator(logger,                  # logger for the session
-                                 None,                    # no internal censor
-                                 "http://facebook.com",   # try to talk to facebook
-                                 geneva.actions.utils.RUN_DIRECTORY, # directory to log
-                                 workers=1,               # workers to use
-                                 runs=1,                  # only need 1 run
-                                 test_type="http",        # use http test
+    tester = evaluator.Evaluator(logger,  # logger for the session
+                                 None,  # no internal censor
+                                 "http://facebook.com",  # try to talk to facebook
+                                 geneva.actions.utils.RUN_DIRECTORY,  # directory to log
+                                 workers=1,  # workers to use
+                                 runs=1,  # only need 1 run
+                                 test_type="http",  # use http test
                                  skip_empty=True)        # don't skip empty strats
 
     population = [
@@ -656,14 +654,14 @@ def test_evaluator_external_server(logger):
     inds = tester.evaluate(population)
     assert inds[0].fitness == -1000
 
-    tester = evaluator.Evaluator(logger,                  # logger for the session
-                                 None,                    # no internal censor
-                                 None,                    # no external server
-                                 geneva.actions.utils.RUN_DIRECTORY, # directory to log
+    tester = evaluator.Evaluator(logger,  # logger for the session
+                                 None,  # no internal censor
+                                 None,  # no external server
+                                 geneva.actions.utils.RUN_DIRECTORY,  # directory to log
                                  use_external_sites=True,
-                                 workers=1,               # workers to use
-                                 runs=1,                  # only need 1 run
-                                 test_type="http",        # use http test
+                                 workers=1,  # workers to use
+                                 runs=1,  # only need 1 run
+                                 test_type="http",  # use http test
                                  skip_empty=False)        # don't skip empty strats
 
     population = [
@@ -685,13 +683,13 @@ def test_evaluator_skip_empty(logger):
     ]
     population = [geneva.actions.utils.parse(ind, logger) for ind in population]
     # Create an evaluator
-    tester = evaluator.Evaluator(logger,                  # logger for the session
-                                 "censor2",               # internal censor
-                                 None,                    # no external server
-                                 geneva.actions.utils.RUN_DIRECTORY, # directory to log
-                                 workers=4,               # workers to use
-                                 runs=1,                  # only need 1 run
-                                 test_type="echo",        # use echo test
+    tester = evaluator.Evaluator(logger,  # logger for the session
+                                 "censor2",  # internal censor
+                                 None,  # no external server
+                                 geneva.actions.utils.RUN_DIRECTORY,  # directory to log
+                                 workers=4,  # workers to use
+                                 runs=1,  # only need 1 run
+                                 test_type="echo",  # use echo test
                                  skip_empty=True)         # skip empty strats
     inds = tester.evaluate(population)
     assert len(inds) == 1
@@ -716,13 +714,13 @@ def test_evaluator_server_side(logger, test_type):
     ]
     population = [geneva.actions.utils.parse(ind, logger) for ind in population]
     # Create an evaluator with a server that only sends RSTs to the client
-    tester = evaluator.Evaluator(logger,                  # logger for the session
-                                 "censor2",               # internal censor
-                                 None,                    # no external server
-                                 geneva.actions.utils.RUN_DIRECTORY, # directory to log
-                                 workers=4,               # workers to use
-                                 runs=1,                  # only need 1 run for testing
-                                 test_type=test_type,     # test both test types
+    tester = evaluator.Evaluator(logger,  # logger for the session
+                                 "censor2",  # internal censor
+                                 None,  # no external server
+                                 geneva.actions.utils.RUN_DIRECTORY,  # directory to log
+                                 workers=4,  # workers to use
+                                 runs=1,  # only need 1 run for testing
+                                 test_type=test_type,  # test both test types
                                  skip_empty=True)         # skip empty strats
 
     inds = tester.evaluate(population)
@@ -766,13 +764,13 @@ def test_evaluator_client_dns_test(client_worker, protocol, logger):
     ]
 
     population = [geneva.actions.utils.parse(ind, logger) for ind in population]
-    tester = evaluator.Evaluator(logger,                  # logger for the session
-                                 None,                    # no internal censor
-                                 None,                    # no external server
-                                 geneva.actions.utils.RUN_DIRECTORY, # directory to log
-                                 workers=1,               # workers to use
-                                 runs=1,                  # only need 1 run for testing
-                                 external_client=False,   # testing an external client
+    tester = evaluator.Evaluator(logger,  # logger for the session
+                                 None,  # no internal censor
+                                 None,  # no external server
+                                 geneva.actions.utils.RUN_DIRECTORY,  # directory to log
+                                 workers=1,  # workers to use
+                                 runs=1,  # only need 1 run for testing
+                                 external_client=False,  # testing an external client
                                  test_type=test_type,
                                  skip_empty=False)        # don't skip empty strats
 

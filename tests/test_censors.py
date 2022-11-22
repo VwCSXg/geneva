@@ -1,11 +1,10 @@
-import logging
 import pytest
 import sys
 # Include the root of the project
 sys.path.append("..")
 
 import censors.censor_driver
-import library
+from geneva import library
 import common
 
 

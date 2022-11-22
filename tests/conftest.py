@@ -6,7 +6,7 @@ import tempfile
 import os
 import shutil
 
-import evolve
+from geneva import evolve
 import geneva.layers.packet
 
 def pytest_addoption(parser):

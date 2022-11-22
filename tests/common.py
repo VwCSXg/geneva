@@ -5,8 +5,7 @@ sys.path.append("..")
 
 import geneva.actions.strategy
 import geneva.actions.utils
-import evolve
-import evaluator
+from geneva import evaluator, evolve
 
 import pytest
 

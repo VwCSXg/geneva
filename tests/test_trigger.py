@@ -6,7 +6,6 @@ import geneva.actions.strategy
 import geneva.actions.tamper
 import geneva.actions.trigger
 import geneva.layers.packet
-import evolve
 
 from scapy.all import IP, TCP
 

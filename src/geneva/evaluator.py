@@ -295,7 +295,7 @@ class Evaluator():
         fitness = None
         if environment.get("remote"):
             fitness = self.run_remote_client(args, environment, logger)
-        elif environment.get("docker"):
+        elif environment.get("../../docker"):
             self.run_docker_client(args, environment, logger)
         else:
             self.run_local_client(args, environment, logger)
@@ -358,7 +358,7 @@ class Evaluator():
         command = []
         if worker["username"] != "root":
             command = ["sudo"]
-        command += [worker["python"], os.path.join(worker["geneva_path"], "src/geneva/plugins/plugin_client.py")]
+        command += [worker["python"], os.path.join(worker["geneva_path"], "plugins/plugin_client.py")]
         base_cmd = geneva.actions.utils.build_command(args)
         command += base_cmd
         command = " ".join(command)
@@ -537,7 +537,7 @@ class Evaluator():
         Return:
             float: fitness of individual (if one is provided)
         """
-        if environment.get("docker"):
+        if environment.get("../../docker"):
             logger.debug("Evaluator: running server inside docker")
             return self.run_docker_server(args, environment, logger)
         else:
@@ -569,7 +569,7 @@ class Evaluator():
         server_thread.start()
         max_wait = 30
         count = 0
-        flag_file = os.path.join(args["output_directory"], "flags", "%s.server_ready" % args["environment_id"])
+        flag_file = os.path.join(args["output_directory"], "../../flags", "%s.server_ready" % args["environment_id"])
 
         while count < max_wait:
             if os.path.exists(flag_file):
@@ -594,8 +594,8 @@ class Evaluator():
         # If the server is running inside a docker container, we don't have access to it directly
         # to shut it down. Instead, write a shutdown flag to instruct it to shut down.
         self.logger.debug("Evaluator shutting down server.")
-        if environment.get("docker"):
-            flag_file = os.path.join(self.args["output_directory"], "flags", "%s.server_shutdown" % self.server_args["environment_id"])
+        if environment.get("../../docker"):
+            flag_file = os.path.join(self.args["output_directory"], "../../flags", "%s.server_shutdown" % self.server_args["environment_id"])
             # Touch shutdown file to instruct the server to shutdown
             open(flag_file, 'a').close()
             self.stop_censor(environment)

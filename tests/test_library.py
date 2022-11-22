@@ -3,7 +3,7 @@ import sys
 # Include the root of the project
 sys.path.append("..")
 
-import library
+from geneva import library
 import common
 import censors.censor_driver
 

@@ -19,7 +19,7 @@ import requests
 
 socket.setdefaulttimeout(1)
 
-import engine
+from geneva import engine
 import geneva.plugins.http.external_sites
 
 from geneva.plugins.plugin import Plugin

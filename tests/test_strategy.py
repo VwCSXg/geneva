@@ -9,8 +9,7 @@ import geneva.actions.sleep
 import geneva.actions.utils
 import geneva.actions.strategy
 import geneva.layers.packet
-import evaluator
-import evolve
+from geneva import evaluator, evolve
 
 from scapy.all import IP, TCP, Raw
 

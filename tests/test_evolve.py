@@ -1,16 +1,12 @@
-import copy
 import tempfile
 import traceback
-import os
 import pytest
 import sys
 # Include the root of the project
 sys.path.append("..")
 
-import library
 import common
-import evolve
-import evaluator
+from geneva import evaluator, evolve, library
 import geneva.actions.utils
 import geneva.actions.action
 import geneva.actions.tree
@@ -165,7 +161,7 @@ def test_disable_fields(logger, use_canary):
         geneva.layers.packet.Packet.reset_restrictions()
 
         # Restrict evolve to using NOT the dataofs or chksum field in the TCP header
-        evolve.restrict_headers(logger, "TCP,UDP", "", "dataofs,chksum",)
+        evolve.restrict_headers(logger, "TCP,UDP", "", "dataofs,chksum", )
         population = []
         print("Generating population pool")
         canary_id = None

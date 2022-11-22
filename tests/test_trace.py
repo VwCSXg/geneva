@@ -1,5 +1,5 @@
 import sys
-import pytest
+
 # Include the root of the project
 sys.path.append("..")
 
@@ -7,7 +7,6 @@ import geneva.actions.trace
 import geneva.layers.packet
 import geneva.actions.strategy
 import geneva.actions.utils
-import evolve
 
 from scapy.all import IP, TCP
 

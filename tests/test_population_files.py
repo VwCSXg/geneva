@@ -1,7 +1,7 @@
 import sys
 import pytest
 sys.path.append("..") # Include the root of the project
-import evolve
+from geneva import evolve
 import os
 import geneva.actions.utils
 import geneva.layers.packet

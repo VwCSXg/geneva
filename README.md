@@ -147,11 +147,11 @@ disabled for incoming action forests.
 The strategy engine (`engine.py`) applies a strategy to a network connection. The engine works by capturing all traffic to/from a specified port. Packets that match an active trigger are run through the associated action-tree, and packets that emerge from the tree are sent on the wire. 
 
 The engine also has a Python API for using it in your application. It can be used as a context manager or invoked in the background as a thread. 
-For example, consider the following simple application. 
+For example, consider the following simple application.
 
 ```python
 import os
-import engine
+from geneva import engine
 
 # Port to run the engine on
 port = 80

@@ -6,7 +6,6 @@ import geneva.actions.duplicate
 import geneva.layers.packet
 import geneva.actions.strategy
 import geneva.actions.utils
-import evolve
 
 from scapy.all import IP, TCP
 

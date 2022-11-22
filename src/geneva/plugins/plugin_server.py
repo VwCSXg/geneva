@@ -12,7 +12,7 @@ PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(BASEPATH)))
 sys.path.append(PROJECT_ROOT)
 
 import geneva.actions.sniffer
-import engine
+import geneva.engine
 
 from geneva.plugins.plugin import Plugin
 
@@ -94,7 +94,7 @@ class ServerPlugin(Plugin):
         self.sniffer = geneva.actions.sniffer.Sniffer(pcap_filename, int(port), logger).__enter__()
 
         # Conditionally initialize the engine
-        self.engine = engine.Engine(port, strategy, server_side=True, environment_id=eid, output_directory=output_path, log_level=args.get("log", "info"), enabled=use_engine, forwarder=forwarder).__enter__()
+        self.engine = geneva.engine.Engine(port, strategy, server_side=True, environment_id=eid, output_directory=output_path, log_level=args.get("log", "info"), enabled=use_engine, forwarder=forwarder).__enter__()
 
         # Run the plugin
         self.server_proc = multiprocessing.Process(target=self.start_thread, args=(args, logger))

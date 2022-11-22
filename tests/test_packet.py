@@ -5,9 +5,9 @@ import geneva.actions.trigger
 import geneva.layers.layer
 from geneva.layers import tcp_layer, dns_layer, dnsqr_layer, udp_layer, ip_layer
 import geneva.layers.packet
-import evolve
+from geneva import evolve
 
-from scapy.all import IP, TCP, UDP, DNS, DNSQR, Raw, DNSRR
+from scapy.all import IP, TCP, UDP, DNS, DNSQR, Raw
 
 
 def test_parse_layers():

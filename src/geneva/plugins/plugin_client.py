@@ -10,7 +10,7 @@ PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(BASEPATH)))
 sys.path.append(PROJECT_ROOT)
 
 import geneva.actions.sniffer
-import engine
+import geneva.engine
 
 from geneva.plugins.plugin import Plugin
 import geneva.actions.utils
@@ -70,7 +70,7 @@ class ClientPlugin(Plugin):
         with geneva.actions.sniffer.Sniffer(pcap_filename, port, logger) as sniff:
 
             # Conditionally initialize the engine
-            with engine.Engine(port, args.get("strategy"), server_side=False, environment_id=eid, output_directory=output_path, log_level=args.get("log", "info"), enabled=use_engine) as eng:
+            with geneva.engine.Engine(port, args.get("strategy"), server_side=False, environment_id=eid, output_directory=output_path, log_level=args.get("log", "info"), enabled=use_engine) as eng:
                 # Wait for the censor to start up, if one is running
                 if args.get("wait_for_censor"):
                     self.wait_for_censor(args.get("server"), port, eid, output_path)
