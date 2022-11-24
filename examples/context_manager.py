@@ -1,11 +1,6 @@
 import os
-import sys
 
-# Add the path to the engine so we can import it
-BASEPATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(BASEPATH)
-
-import engine
+from geneva import engine
 
 # Port to run the engine on
 port = 80

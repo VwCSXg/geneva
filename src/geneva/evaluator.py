@@ -616,7 +616,7 @@ class Evaluator():
         """
         server = self.server_cls(args)
         logger.debug("Starting local server with args: %s" % str(args))
-        server_logger = geneva.actions.utils.get_logger(PROJECT_ROOT, args["output_directory"], "server", "server", environment["id"], log_level=geneva.actions.utils.get_console_log_level())
+        server_logger = geneva.actions.utils.get_logger(args["output_directory"], "server", "server", environment["id"], log_level=geneva.actions.utils.get_console_log_level())
         environment["server_logger"] = server_logger
         args.update({"test_type": self.server_cls.name})
         if not args.get("server_side"):
@@ -841,7 +841,7 @@ class Evaluator():
         log_files = ["client.log", "engine.log", "censor.log", "server.log"]
         for log_file in log_files:
             log = ""
-            log_path = os.path.join(BASEPATH,
+            log_path = os.path.join(PROJECT_ROOT,
                                     self.output_directory,
                                     "logs",
                                     "%s.%s" % (environment_id, log_file))
@@ -1010,7 +1010,7 @@ class Evaluator():
         Args:
             ind (:obj:`geneva.actions.strategy.Strategy`): Individual to read fitness for
         """
-        fitness_path = os.path.join(BASEPATH, self.output_directory, geneva.actions.utils.FLAGFOLDER, ind.environment_id + ".fitness")
+        fitness_path = os.path.join(PROJECT_ROOT, self.output_directory, geneva.actions.utils.FLAGFOLDER, ind.environment_id + ".fitness")
         try:
             if os.path.exists(fitness_path):
                 with open(fitness_path, "r") as fd:

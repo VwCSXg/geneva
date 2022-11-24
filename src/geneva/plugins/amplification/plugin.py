@@ -14,9 +14,6 @@ import geneva.actions.utils
 import geneva.layers.packet
 from geneva.plugins.plugin import Plugin
 
-BASEPATH = os.path.dirname(os.path.abspath(__file__))
-PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(BASEPATH))))
-
 
 def get_open_sport(strategy_ports, logger):
     """

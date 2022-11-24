@@ -10,7 +10,7 @@ import sys
 ACTION_CACHE = {}
 ACTION_CACHE["in"] = {}
 ACTION_CACHE["out"] = {}
-BASEPATH = os.path.sep.join(os.path.dirname(os.path.abspath(__file__)).split(os.path.sep)[:-1])
+BASEPATH = os.path.dirname(os.path.abspath(__file__))
 
 
 class Action():
@@ -102,16 +102,14 @@ class Action():
             return ACTION_CACHE[direction][terminal]
 
         collected_actions = []
-        # Get the base path for the project relative to this file
-        path = os.path.join(BASEPATH, "actions")
-        for action_file in os.listdir(path):
+        for action_file in os.listdir(BASEPATH):
             if not action_file.endswith(".py"):
                 continue
             action = action_file.replace(".py", "")
             if BASEPATH not in sys.path:
                 sys.path.append(BASEPATH)
 
-            importlib.import_module("actions." + action)
+            importlib.import_module("geneva.actions." + action)
             def check_action(obj):
                 return inspect.isclass(obj) and \
                        issubclass(obj, Action) and \
@@ -120,7 +118,7 @@ class Action():
                        obj().enabled and \
                        not any([x in str(obj) for x in disabled]) and \
                        (allow_terminal or not obj().terminal)
-            clsmembers = inspect.getmembers(sys.modules["actions."+action], predicate=check_action)
+            clsmembers = inspect.getmembers(sys.modules["geneva.actions."+action], predicate=check_action)
             collected_actions += clsmembers
 
         collected_actions = list(set(collected_actions))

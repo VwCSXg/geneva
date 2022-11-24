@@ -105,8 +105,7 @@ def parse(requested_trees, logger):
     return strat
 
 
-
-def get_logger(basepath, log_dir, logger_name, log_name, environment_id, log_level="DEBUG", file_log_level="DEBUG", demo_mode=False):
+def get_logger(log_dir, logger_name, log_name, environment_id, log_level="DEBUG", file_log_level="DEBUG", demo_mode=False):
     """
     Configures and returns a logger.
     """
@@ -115,10 +114,10 @@ def get_logger(basepath, log_dir, logger_name, log_name, environment_id, log_lev
     if type(file_log_level) == str:
         file_log_level = file_log_level.upper()
     global CONSOLE_LOG_LEVEL
-    full_path = os.path.join(basepath, log_dir, "logs")
+    full_path = os.path.join(PROJECT_ROOT, log_dir, "logs")
     if not os.path.exists(full_path):
         os.makedirs(full_path)
-    flag_path = os.path.join(basepath, log_dir, "flags")
+    flag_path = os.path.join(PROJECT_ROOT, log_dir, "flags")
     if not os.path.exists(flag_path):
         os.makedirs(flag_path)
     # Set up a client logger
@@ -130,7 +129,7 @@ def get_logger(basepath, log_dir, logger_name, log_name, environment_id, log_lev
     # If we've already setup the handlers for this logger, just return it
     if logger.handlers:
         return logger
-    fh = logging.FileHandler(os.path.join(basepath, log_dir, "logs", "%s.%s.log" % (environment_id, log_name)))
+    fh = logging.FileHandler(os.path.join(PROJECT_ROOT, log_dir, "logs", "%s.%s.log" % (environment_id, log_name)))
 
     log_prefix = "[%s] " % log_name.upper()
     formatter = logging.Formatter("%(asctime)s %(levelname)s:" + log_prefix + "%(message)s", datefmt="%Y-%m-%d %H:%M:%S")
@@ -260,7 +259,7 @@ class Logger():
         """
         Sets up a logger.
         """
-        self.logger = get_logger(PROJECT_ROOT, self.log_dir, self.logger_name, self.log_name, self.environment_id, log_level=self.log_level)
+        self.logger = get_logger(self.log_dir, self.logger_name, self.log_name, self.environment_id, log_level=self.log_level)
         return self.logger
 
     def __exit__(self, exc_type, exc_value, tb):

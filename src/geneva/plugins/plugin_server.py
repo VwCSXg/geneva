@@ -15,6 +15,7 @@ import geneva.actions.sniffer
 import geneva.engine
 
 from geneva.plugins.plugin import Plugin
+import geneva.actions.utils
 
 
 class ServerPlugin(Plugin):

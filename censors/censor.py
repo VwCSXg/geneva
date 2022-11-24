@@ -38,7 +38,7 @@ class Censor(object):
         self.logger = None
         self.log_dir = log_dir
         if log_level:
-            self.logger = geneva.actions.utils.get_logger(BASEPATH, log_dir, __name__, "censor", eid, log_level=log_level)
+            self.logger = geneva.actions.utils.get_logger(log_dir, __name__, "censor", eid, log_level=log_level)
             self.logger.debug("Censor created to port %d on queue %d" % (port, queue_num))
 
     def start(self):

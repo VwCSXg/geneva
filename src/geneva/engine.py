@@ -31,6 +31,7 @@ import geneva.actions.utils
 import geneva.layers.packet
 
 BASEPATH = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(os.path.dirname(BASEPATH))
 
 
 class Engine():
@@ -85,14 +86,13 @@ class Engine():
             self.environment_id = geneva.actions.utils.get_id()
 
         # Set up a logger
-        self.logger = geneva.actions.utils.get_logger(BASEPATH,
-                                               self.output_directory,
-                                               __name__,
+        self.logger = geneva.actions.utils.get_logger(self.output_directory,
+                                                      __name__,
                                                "engine",
-                                               self.environment_id,
-                                               log_level=log_level,
-                                               file_log_level=file_log_level,
-                                               demo_mode=demo_mode)
+                                                      self.environment_id,
+                                                      log_level=log_level,
+                                                      file_log_level=file_log_level,
+                                                      demo_mode=demo_mode)
         # Warn if these are not provided
         if not environment_id:
             self.logger.warning("No environment ID given, one has been generated (%s)", self.environment_id)
@@ -319,13 +319,14 @@ class Engine():
         self.out_nfqueue_socket.close()
         self.in_nfqueue_socket.close()
 
-        packets_path = os.path.join(BASEPATH,
+        packets_path = os.path.join(PROJECT_ROOT,
                                     self.output_directory,
                                     "packets",
                                     "original_%s.pcap" % self.environment_id)
 
         # Write to disk the original packets we captured
         if self.save_seen_packets:
+            wrpcap(packets_path, [p.packet for p in self.seen_packets])
             wrpcap(packets_path, [p.packet for p in self.seen_packets])
 
         # If the engine exits before it initializes for any reason, these threads may not be set
