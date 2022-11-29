@@ -13,7 +13,7 @@ This codebase contains the Geneva's full implementation: its genetic algorithm, 
 ## Setup
 
 Geneva has been developed and tested for Centos or Debian-based systems. Due to limitations of
-netfilter and raw sockets, Geneva does not work on OS X or Windows at this time and requires *python3.6*.
+netfilter and raw sockets, Geneva does not work on OS X or Windows at this time.
 More detailed setup instructions are available at our [documentation](https://geneva.readthedocs.io).
 
 Install netfilterqueue dependencies:
@@ -21,12 +21,12 @@ Install netfilterqueue dependencies:
 # sudo apt-get install build-essential python-dev libnetfilter-queue-dev libffi-dev libssl-dev iptables python3-pip
 ```
 
-Install Python dependencies:
+Install geneva:
 ```
-# python3 -m pip install .
+# python3 -m pip install git+https://github.com/Kkevsterrr/geneva.git
 ```
 
-On Debian 10 systems, some users have reported needing to install netfilterqueue directly from Github: 
+On Debian 10 systems, some users have reported needing to install netfilterqueue directly from GitHub: 
 ```
 # sudo python3 -m pip install --upgrade -U git+https://github.com/kti/python-netfilterqueue
 ```
@@ -37,7 +37,7 @@ A censorship evasion strategy is simply a _description of how network traffic sh
 code, it is a description that tells the engine how it should operate over traffic. For a fuller description of the DNA syntax, see [Censorship Evasion Strategies](#Censorship-Evasion-Strategies).
 
 ```
-# python3 engine.py --server-port 80 --strategy "[TCP:flags:PA]-duplicate(tamper{TCP:dataofs:replace:10}(tamper{TCP:chksum:corrupt},),)-|" --log debug
+# python3 -m geneva.engine --server-port 80 --strategy "[TCP:flags:PA]-duplicate(tamper{TCP:dataofs:replace:10}(tamper{TCP:chksum:corrupt},),)-|" --log debug
 2019-10-14 16:34:45 DEBUG:[ENGINE] Engine created with strategy \/ (ID bm3kdw3r) to port 80
 2019-10-14 16:34:45 DEBUG:[ENGINE] Configuring iptables rules
 2019-10-14 16:34:45 DEBUG:[ENGINE] iptables -A OUTPUT -p tcp --sport 80 -j NFQUEUE --queue-num 1
@@ -144,7 +144,7 @@ disabled for incoming action forests.
 
 ## Engine
 
-The strategy engine (`engine.py`) applies a strategy to a network connection. The engine works by capturing all traffic to/from a specified port. Packets that match an active trigger are run through the associated action-tree, and packets that emerge from the tree are sent on the wire. 
+The strategy engine (`engine.py`, `geneva.engine`) applies a strategy to a network connection. The engine works by capturing all traffic to/from a specified port. Packets that match an active trigger are run through the associated action-tree, and packets that emerge from the tree are sent on the wire. 
 
 The engine also has a Python API for using it in your application. It can be used as a context manager or invoked in the background as a thread. 
 For example, consider the following simple application.
