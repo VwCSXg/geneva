@@ -8,7 +8,6 @@ packages = [{include = "geneva", from = "src"}]
 
 [tool.poetry.dependencies]
 python = ">=3.7,<4"
-pytest = "^7.2.0"
 scapy = "^2.4.3"
 requests = "^2.28.1"
 dnspython = "^2.2.1"
@@ -20,13 +19,18 @@ netfilterqueue = "^1.0.0"
 cryptography = "3.3.2"
 paramiko = "^2.12.0"
 codecov = "^2.1.12"
-pytest-cov = "^4.0.0"
 tld = "^0.12.6"
 python-dotenv = "^0.21.0"
 mysql-connector = "^2.2.9"
 beautifulsoup4 = "^4.11.1"
 psutil = "^5.9.4"
 tqdm = "^4.64.1"
+
+[tool.poetry.group.test.dependencies]
+pytest = "^7.2.0"
+pytest-cov = "^4.0.0"
+pytest-html = "^3.2.0"
+pytest-timeout = "^2.1.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
