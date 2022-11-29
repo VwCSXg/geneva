@@ -24,7 +24,7 @@ install:
     - sudo visudo -c -f /tmp/sudoers.tmp # Verify the sudoers file
     - sudo cp /tmp/sudoers.tmp /etc/sudoers # Copy in the sudoers file
     - sudo echo $PATH # Confirm the PATH changes took effect
-    - sudo python3 -m pip install -r requirements.txt
+    - sudo python3 -m pip install .
     - sudo python3 -m pip install slackclient pytest-cov
     - docker build -t base:latest -f docker/Dockerfile .
 

@@ -23,7 +23,7 @@ Install netfilterqueue dependencies:
 
 Install Python dependencies:
 ```
-# python3 -m pip install -r requirements.txt
+# python3 -m pip install .
 ```
 
 On Debian 10 systems, some users have reported needing to install netfilterqueue directly from Github: 
