@@ -121,8 +121,8 @@ class FragmentAction(Action):
         # Make sure we don't go out of bounds by choosing the min
         overlap_bytes = min(len(payload[fragsize:]), self.overlap)
         # Attach these bytes to the first packet
-        pkt1 = IP(packet["IP"])/payload[:fragsize + overlap_bytes]
-        pkt2 = IP(packet["IP"])/payload[fragsize:]
+        pkt1 = IP(packet["IP"].build())/payload[:fragsize + overlap_bytes]
+        pkt2 = IP(packet["IP"].build())/payload[fragsize:]
 
         # We cannot rely on scapy's native parsing here - if a previous action has changed the
         # fragment offset, scapy will not identify this as TCP, so we must do it for scapy
